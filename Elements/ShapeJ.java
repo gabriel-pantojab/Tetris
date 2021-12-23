@@ -13,10 +13,10 @@ public class ShapeJ extends Wall{
     }
     
     protected void createWall(int row_center, int column_center){
-        blocks.add(new Block(row_center-2, column_center, color));
-        blocks.add(new Block(row_center-1, column_center, color));
-        blocks.add(new Block(row_center, column_center, color));
+        blocks.add(new Block(row_center-1, column_center-1, color));
         blocks.add(new Block(row_center, column_center-1, color));
+        blocks.add(new Block(row_center, column_center, color));
+        blocks.add(new Block(row_center, column_center+1, color));
     }
     
     public Wall clone(){

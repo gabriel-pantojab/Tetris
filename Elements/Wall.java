@@ -104,6 +104,12 @@ public abstract class Wall{
         lock.unlock();
     }
     
+    public void paintBorder(Graphics g){
+        lock.lock();
+        for(Block block: blocks) block.paintBorder(g);
+        lock.unlock();
+    }
+    
     public Position center(){
         return center_position;
     }

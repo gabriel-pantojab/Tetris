@@ -10,8 +10,9 @@ public class Tetris extends JFrame{
     private Game game;
     private LaminaGame lamina_game;
     private LaminaCola cola;
-    private JButton start, pause, resume;
-    public static JLabel line;
+    private JButton start, pause, resume, restart, help;
+    public static JLabel line, score;
+    
     public Tetris(){
         setLayout(new BorderLayout());
         setBounds(0, 0, 610, 650);
@@ -32,6 +33,10 @@ public class Tetris extends JFrame{
         line.setText("Line: "+LaminaGame.line);
     }
     
+    public static void setScore(){
+        score.setText("Score: "+LaminaGame.score);
+    }
+    
     public void init(){
         game.init();
     }
@@ -43,6 +48,7 @@ public class Tetris extends JFrame{
             public void actionPerformed(ActionEvent e){
                 if(!game.isGame()){
                     game.setCurrentWall(game.throwWall());
+                    game.initShadowCurrentWall();
                     game.addWallQueue();
                     cola.repaint();
                     game.begin();
@@ -74,10 +80,33 @@ public class Tetris extends JFrame{
             }
         });
         
+        restart = new JButton("Restart");
+        restart.setBounds(5, 250, 90, 30);
+        restart.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+                if (game.isGame()) {
+                    cola.restart();
+                }
+            }
+        });
+        
+        help = new JButton("Help");
+        help.setBounds(15, 300, 70, 30);
+        help.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+                new Instruccion(Tetris.this);
+            }
+        });
+        
         line = new JLabel("Line: "+LaminaGame.line);
-        line.setBounds(20, 300, 100, 30);
+        line.setBounds(20, 350, 100, 30);
         line.setFont(new Font("Arial", Font.BOLD, 15));
         line.setForeground(Color.WHITE);
+        
+        score = new JLabel("Score: "+LaminaGame.score);
+        score.setBounds(20, 380, 100, 30);
+        score.setFont(new Font("Arial", Font.BOLD, 15));
+        score.setForeground(Color.WHITE);
         
         JPanel panel_buttons = new JPanel();
         panel_buttons.setLayout(null);
@@ -86,7 +115,10 @@ public class Tetris extends JFrame{
         panel_buttons.add(start);
         panel_buttons.add(pause);
         panel_buttons.add(resume);
+        panel_buttons.add(restart);
         panel_buttons.add(line);
+        panel_buttons.add(score);
+        panel_buttons.add(help);
         
         
         add(panel_buttons, BorderLayout.WEST);
@@ -99,9 +131,11 @@ public class Tetris extends JFrame{
 
 class LaminaGame extends JPanel{
     private Game game;
-    public static int line;
+    public static int line, score;
+    
     public LaminaGame(Game game){
         line = 0;
+        score = 0;
         setBackground(new Color(153, 217, 234));
         this.game = game;
         addKeyListener(new Manager());
@@ -115,6 +149,7 @@ class LaminaGame extends JPanel{
             public void run(){
                 //if(game.isGame() && !game.isPause() && !game.gameOver()) repaint();
                 repaint();
+                if(!game.isGame()) timer.cancel();
             }
         };
         timer.schedule(task, 0, 10);
@@ -140,8 +175,11 @@ class LaminaGame extends JPanel{
             for (Block b : game.getCurrentWall().getBlocks()) {
                 if (b.getPositionInRow() >= 0) {
                     b.paint(g);
+                }else {
+                    b.paintBorder(g);
                 }
             }
+            game.getshadowCurrentWall().paintBorder(g);
         }
         game.paintBoard(g);
     }
@@ -159,6 +197,10 @@ class LaminaGame extends JPanel{
                     game.rotateRightCurrentWall();
                 else if(e.getKeyCode() == KeyEvent.VK_DOWN)
                     game.runBottomCurrentWall();
+                else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+                    while(game.runBottomCurrentWall());
+                }
+                game.runShadowCurrentWall();
             }
         }
         public void keyReleased(KeyEvent e){}
@@ -168,6 +210,7 @@ class LaminaGame extends JPanel{
 
 class LaminaCola extends JPanel{
     private Game game;
+    java.util.Timer timer;
     public LaminaCola(Game game){
         setBackground(new Color(195, 195, 195));
         setPreferredSize(new Dimension(140, 600));
@@ -175,20 +218,25 @@ class LaminaCola extends JPanel{
     }
     
     public void init(){
-        java.util.Timer timer = new java.util.Timer();
+        timer = new java.util.Timer();
         java.util.TimerTask task = new java.util.TimerTask(){
             public void run(){
                 boolean gameOver = game.gameOver();
                 if(game.isGame() && !game.isPause() && !gameOver){
                     if(!game.runBottomCurrentWall()){
                         game.addWallsInBoard(game.getCurrentWall());
-                        game.setCurrentWall(game.throwWall());
-                        game.addWallQueue();
-                        int cant_clear = game.clearBlocks();
-                        if(cant_clear != 0){
-                            LaminaGame.line += cant_clear;
-                            Tetris.setLine();
-                            game.runBottomAllWallsInBoard(cant_clear);
+                        if(!game.gameOver()) {
+                            LaminaGame.score += 10;
+                            Tetris.setScore();
+                            game.setCurrentWall(game.throwWall());
+                            game.addWallQueue();
+                            int cant_clear = game.clearBlocks();
+                            if(cant_clear != 0){
+                                LaminaGame.line += cant_clear;
+                                Tetris.setLine();
+                                game.runBottomAllWallsInBoard(cant_clear);
+                            }
+                            game.runShadowCurrentWall();
                         }
                         repaint();
                     }
@@ -197,7 +245,10 @@ class LaminaCola extends JPanel{
                 if(gameOver) {
                     timer.cancel();
                     LaminaGame.line = 0;
+                    LaminaGame.score = 0;
                     JOptionPane.showMessageDialog(null, "GAME OVER!!!");
+                    Tetris.setLine();
+                    Tetris.setScore();
                     game.end();
                     game.restart();
                     game.init();
@@ -206,6 +257,18 @@ class LaminaCola extends JPanel{
             }
         };
         timer.schedule(task, 0, 500);
+    }
+    
+    public void restart() {
+        timer.cancel();
+        LaminaGame.line = 0;
+        LaminaGame.score = 0;
+        Tetris.setLine();
+        Tetris.setScore();
+        game.end();
+        game.restart();
+        game.init();
+        repaint();
     }
     
     public void paintComponent(Graphics g){

@@ -23,38 +23,37 @@ public class ProofPaintWall extends JFrame{
 class LaminaWall extends JPanel{
     private Wall te, rect, ele, zeta, square, jota, ese, cross;
     public LaminaWall(){
-        //te     = new ShapeT(3, 3, Color.GRAY);
+        te     = new ShapeT(3, 3, Color.GRAY);
         rect   = new ShapeRect(3, 10, Color.RED);
-        rect.rotateLeft();
-        /*ele    = new ShapeEle(3, 17, Color.ORANGE);
+        ele    = new ShapeEle(3, 17, Color.ORANGE);
         zeta   = new ShapeZeta(3, 24, Color.BLUE);
         square = new ShapeSquare(3, 31, Color.GREEN);
         jota   = new ShapeJ(3, 38, Color.PINK);
         ese    = new ShapeS(3, 45, Color.YELLOW);
-        cross  = new ShapeCross(3, 3, Color.GRAY);*/
+        cross  = new ShapeCross(3, 3, Color.GRAY);
         addKeyListener(new Manager());
         setFocusable(true);
     }
     
     public void paintComponent(Graphics g){
         super.paintComponent(g);
-        //cross.paint(g);
-        //te.paint(g);
+        cross.paintBorder(g);
+        te.paintBorder(g);
         g.setColor(Color.RED);
         g.drawLine(0, 100, 1000, 100);
-        rect.paint(g);
-        /*ele.paint(g);
-        zeta.paint(g);
-        jota.paint(g);
-        ese.paint(g);
-        square.paint(g);*/
+        rect.paintBorder(g);
+        ele.paintBorder(g);
+        zeta.paintBorder(g);
+        jota.paintBorder(g);
+        ese.paintBorder(g);
+        square.paintBorder(g);
     }
     public void start(){
         Thread h = new Thread(){
             public void run(){
                 while(true){
                     try{
-                        /*te.rotateLeft();
+                        te.rotateLeft();
                         
                         rect.rotateLeft();
                         
@@ -64,7 +63,7 @@ class LaminaWall extends JPanel{
                         
                         jota.rotateLeft();
                         
-                        ese.rotateLeft();*/
+                        ese.rotateLeft();
                         
                         repaint();
                         sleep(500);
@@ -78,18 +77,18 @@ class LaminaWall extends JPanel{
     private class Manager implements KeyListener{
         public void keyPressed(KeyEvent e){
             if(e.getKeyCode() == KeyEvent.VK_UP)
-                zeta.runTop();
+                square.runTop();
             else if(e.getKeyCode() == KeyEvent.VK_DOWN)
-                zeta.runBottom();
+                square.runBottom();
             else if(e.getKeyCode() == KeyEvent.VK_RIGHT)
-                zeta.runRight();
+                square.runRight();
             else if(e.getKeyCode() == KeyEvent.VK_LEFT)
-                zeta.runLeft();
+                square.runLeft();
             else if(e.getKeyCode() == KeyEvent.VK_A)
-                zeta.rotateLeft();
+                square.rotateLeft();
             else if(e.getKeyCode() == KeyEvent.VK_S)
-                zeta.rotateRight();
-            if(e.getKeyCode() == KeyEvent.VK_D) rect.clearBlocksInRow(3);
+                square.rotateRight();
+            //if(e.getKeyCode() == KeyEvent.VK_D) rect.clearBlocksInRow(3);
             repaint();
         }
         public void keyReleased(KeyEvent e){}

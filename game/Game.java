@@ -14,11 +14,14 @@ public class Game{
     private boolean en_juego, pause, game_over;
     private final Random random = new Random();
     
+    private Wall shadowCurrentWall;
+    
     private int row_limit;
 
     private final int LIMIT_ROW    = 28;
     private final int LIMIT_COLUMN = 16;
-    private final Color[] colors   = {new Color(0, 0, 200), new Color(0, 200, 0), new Color(128, 0, 255)};
+    private final Color[] colors   = {new Color(0, 0, 200), new Color(0, 200, 0), new Color(128, 0, 255), new Color(255, 127, 39), 
+                                       new Color(200, 0, 0), Color.ORANGE, new Color(185, 122, 87), new Color(64, 128, 128)};
     
     public Game(){
         walls = new LinkedList<Wall>();   
@@ -79,17 +82,17 @@ public class Game{
         return walls;
     }
     
-    private synchronized  boolean shocks(){
+    private synchronized  boolean shocks(Wall nWall){
         for(Wall wall: wallsInBoard){
             for(Block block: wall.getBlocks()){
-                if(shockWithCurrentWall(block)) return true;
+                if(shockWithCurrentWall(block, nWall)) return true;
             }
         }
         return false;
     }
     
-    private synchronized boolean shockWithCurrentWall(Block block){
-        for(Block b: currentWall.getBlocks()){
+    private synchronized boolean shockWithCurrentWall(Block block, Wall nWall){
+        for(Block b: nWall.getBlocks()){
             if ((Math.abs(b.getPositionInRow()-block.getPositionInRow()) == 1) && 
             (b.getPositionInColumn() == block.getPositionInColumn()) && (b.getPositionInRow() < block.getPositionInRow()))
             {
@@ -166,18 +169,38 @@ public class Game{
     
     public Wall throwWall(){
         Wall w = walls.pollFirst();
-        int column = (int)(Math.random()*12+3);  
-        w.setCenter(new Position(0, column));
+        int column = 7;//(int)(Math.random()*12+3);  
+        if(w instanceof ShapeRect)
+            w.setCenter(new Position(0, column));
+        else 
+            w.setCenter(new Position(1, column));
         w.recalculateWall();
+        //Controlar si hay espacio para añadirlo
+        for (Block b : w.getBlocks()) {
+            if (board[w.center().getRow()][b.getPositionInColumn()] != null) {
+                w.setCenter(new Position(w.center().getRow()-1, column));
+                w.recalculateWall();
+                break;
+            }
+        }
         return w;
     }
     
+    public void runShadowCurrentWall() {
+        shadowCurrentWall = currentWall.clone();
+        while(!shadowCurrentWall.shockRow(LIMIT_ROW-1) && !shocks(shadowCurrentWall)) {
+            shadowCurrentWall.runBottom();
+        }
+    }
+    
     public boolean runBottomCurrentWall(){
-        if(!currentWall.shockRow(LIMIT_ROW-1) && !shocks()){
+        if(!currentWall.shockRow(LIMIT_ROW-1) && !shocks(currentWall)){
             currentWall.runBottom();
             return true;
         }
-        verifyGameOver();
+        if (currentWall.center().getRow() < LIMIT_ROW / 2) {
+            verifyGameOver();
+        }
         return false;
     }
     
@@ -209,12 +232,17 @@ public class Game{
         currentWall = new_wall;
     }
     
-    public void addWallsInBoard(Wall w){
+    public void initShadowCurrentWall() {
+        shadowCurrentWall = currentWall.clone();
+        runShadowCurrentWall();
+    }
+    
+    public synchronized void addWallsInBoard(Wall w){
         wallsInBoard.add(w);
         try{
             updateBoard();
         }catch(Exception e){
-            System.out.println("Failed in addWallsInBoard()");
+            //System.out.println("Failed in addWallsInBoard()");
         }
     }
     
@@ -274,6 +302,10 @@ public class Game{
         return currentWall;
     }
     
+    public Wall getshadowCurrentWall(){
+        return shadowCurrentWall;
+    }
+    
     public void runBottomAllWallsInBoard(int cant){
         for(Wall w: wallsInBoard){
             w.runBottom(row_limit, cant); 
@@ -282,17 +314,24 @@ public class Game{
     
     private synchronized void verifyGameOver() {
         for(Block block: currentWall.getBlocks()){
-            if (block.getPositionInRow() <= 1) game_over =  true; 
+            if (block.getPositionInRow() < 1) game_over =  true; 
         }
     }
-    //No funciona del todo bien
+
     public boolean gameOver(){
         return game_over;
     }
     
     public synchronized void paintBoard(Graphics g) {
         for(Wall w: wallsInBoard){
-            w.paint(g);
+            for (Block b : w.getBlocks()) {
+                if (b.getPositionInRow() >= 0) {
+                    b.paint(g);
+                }else {
+                    b.paintBorder(g);
+                }
+            }
+            //w.paint(g);
         }
     }
 }
