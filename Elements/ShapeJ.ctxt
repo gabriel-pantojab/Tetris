@@ -1,0 +1,11 @@
+#BlueJ class context
+comment0.target=ShapeJ
+comment1.params=row_center\ column_center\ color
+comment1.target=ShapeJ(int,\ int,\ java.awt.Color)
+comment2.params=center\ color
+comment2.target=ShapeJ(Position,\ java.awt.Color)
+comment3.params=row_center\ column_center
+comment3.target=void\ createWall(int,\ int)
+comment4.params=
+comment4.target=Wall\ clone()
+numComments=5

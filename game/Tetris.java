@@ -43,7 +43,7 @@ public class Tetris extends JFrame{
             public void actionPerformed(ActionEvent e){
                 if(!game.isGame()){
                     game.setCurrentWall(game.throwWall());
-                    game.addWall();
+                    game.addWallQueue();
                     cola.repaint();
                     game.begin();
                     lamina_game.init();
@@ -113,7 +113,8 @@ class LaminaGame extends JPanel{
         java.util.Timer timer = new java.util.Timer();
         java.util.TimerTask task = new java.util.TimerTask(){
             public void run(){
-                if(game.isGame() && !game.isPause() && !game.gameOver()) repaint();
+                //if(game.isGame() && !game.isPause() && !game.gameOver()) repaint();
+                repaint();
             }
         };
         timer.schedule(task, 0, 10);
@@ -135,36 +136,30 @@ class LaminaGame extends JPanel{
         }
         
         
-        if(game.getCurrentWall() != null)
-            game.getCurrentWall().paint(g);
-        if(!game.getWallsInBoard().isEmpty()){
-            for(Wall w: game.getWallsInBoard()){
-                w.paint(g);
+        if(game.getCurrentWall() != null) {
+            for (Block b : game.getCurrentWall().getBlocks()) {
+                if (b.getPositionInRow() >= 0) {
+                    b.paint(g);
+                }
             }
         }
-        /*ArrayList<Wall> was = new ArrayList();
-        int c =0;
-        for(int i=0; i<8; i++){
-            was.add(new ShapeSquare(27, c, Color.GRAY));
-            c+=2;
-        }
-        for(Wall w: was){
-            w.paint(g);
-        }*/
+        game.paintBoard(g);
     }
     
     private class Manager implements KeyListener{
         public void keyPressed(KeyEvent e){
-            if(e.getKeyCode() == KeyEvent.VK_RIGHT)
-                game.runRightCurrentWall();
-            else if(e.getKeyCode() == KeyEvent.VK_LEFT)
-                game.runLeftCurrentWall();
-            else if(e.getKeyCode() == KeyEvent.VK_A)
-                game.rotateLeftCurrentWall();
-            else if(e.getKeyCode() == KeyEvent.VK_S)
-                game.rotateRightCurrentWall();
-            else if(e.getKeyCode() == KeyEvent.VK_DOWN)
-                game.runBottomCurrentWall();
+            if (!game.isPause()) { 
+                if(e.getKeyCode() == KeyEvent.VK_RIGHT)
+                    game.runRightCurrentWall();
+                else if(e.getKeyCode() == KeyEvent.VK_LEFT)
+                    game.runLeftCurrentWall();
+                else if(e.getKeyCode() == KeyEvent.VK_A)
+                    game.rotateLeftCurrentWall();
+                else if(e.getKeyCode() == KeyEvent.VK_S)
+                    game.rotateRightCurrentWall();
+                else if(e.getKeyCode() == KeyEvent.VK_DOWN)
+                    game.runBottomCurrentWall();
+            }
         }
         public void keyReleased(KeyEvent e){}
         public void keyTyped(KeyEvent e){}
@@ -183,11 +178,12 @@ class LaminaCola extends JPanel{
         java.util.Timer timer = new java.util.Timer();
         java.util.TimerTask task = new java.util.TimerTask(){
             public void run(){
-                if(game.isGame() && !game.isPause() && !game.gameOver()){
+                boolean gameOver = game.gameOver();
+                if(game.isGame() && !game.isPause() && !gameOver){
                     if(!game.runBottomCurrentWall()){
                         game.addWallsInBoard(game.getCurrentWall());
                         game.setCurrentWall(game.throwWall());
-                        game.addWall();
+                        game.addWallQueue();
                         int cant_clear = game.clearBlocks();
                         if(cant_clear != 0){
                             LaminaGame.line += cant_clear;
@@ -196,6 +192,16 @@ class LaminaCola extends JPanel{
                         }
                         repaint();
                     }
+                }
+                
+                if(gameOver) {
+                    timer.cancel();
+                    LaminaGame.line = 0;
+                    JOptionPane.showMessageDialog(null, "GAME OVER!!!");
+                    game.end();
+                    game.restart();
+                    game.init();
+                    repaint();
                 }
             }
         };

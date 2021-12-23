@@ -4,13 +4,14 @@ import java.util.LinkedList;
 import java.util.Random;
 import java.awt.Color;
 import java.util.ArrayList;
+import java.awt.*;
 
 public class Game{
     private LinkedList<Wall> walls;
     private Element board[][];
     private ArrayList<Wall> wallsInBoard;
     private Wall currentWall;
-    private boolean en_juego, pause;
+    private boolean en_juego, pause, game_over;
     private final Random random = new Random();
     
     private int row_limit;
@@ -24,13 +25,16 @@ public class Game{
         board = new Element[28][16];
         wallsInBoard = new ArrayList<Wall>();
         row_limit = 0;
+        game_over = false;
     }
     
     public void restart(){
         walls.clear();   
         clearBoard();
         wallsInBoard.clear();
+        currentWall = null;
         row_limit = 0;
+        game_over = false;
     }
     
     private void clearBoard(){
@@ -43,12 +47,12 @@ public class Game{
     
     public void init(){
         for(int i=0; i<4; i++)
-            addWall();
+            addWallQueue();
     }
     
     public void end(){
         en_juego = false;
-        pause    = true;
+        pause    = false;
     }
     
     public void begin(){
@@ -75,7 +79,7 @@ public class Game{
         return walls;
     }
     
-    private boolean shocks(){
+    private synchronized  boolean shocks(){
         for(Wall wall: wallsInBoard){
             for(Block block: wall.getBlocks()){
                 if(shockWithCurrentWall(block)) return true;
@@ -84,10 +88,52 @@ public class Game{
         return false;
     }
     
-    private boolean shockWithCurrentWall(Block block){
+    private synchronized boolean shockWithCurrentWall(Block block){
         for(Block b: currentWall.getBlocks()){
-            if(Math.abs(b.getPositionInRow()-block.getPositionInRow()) == 1 && 
-                b.getPositionInColumn() == block.getPositionInColumn()) return true;
+            if ((Math.abs(b.getPositionInRow()-block.getPositionInRow()) == 1) && 
+            (b.getPositionInColumn() == block.getPositionInColumn()) && (b.getPositionInRow() < block.getPositionInRow()))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    private synchronized  boolean sideCrash(boolean type){
+        for(Wall wall: wallsInBoard){
+            for(Block block: wall.getBlocks()){
+                if (type) {
+                    if (sideCrashRight(block)) {
+                        return true;
+                    }
+                }else {
+                    if (sideCrashLeft(block)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    
+    private boolean sideCrashLeft(Block block) {
+        for(Block b: currentWall.getBlocks()){
+            if (((Math.abs(b.getPositionInColumn()-block.getPositionInColumn()) == 1) && 
+            (b.getPositionInRow() == block.getPositionInRow())) && (block.getPositionInColumn() < b.getPositionInColumn()))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    private boolean sideCrashRight(Block block) {
+        for(Block b: currentWall.getBlocks()){
+            if (((Math.abs(b.getPositionInColumn()-block.getPositionInColumn()) == 1) && 
+            (b.getPositionInRow() == block.getPositionInRow())) && (block.getPositionInColumn() > b.getPositionInColumn()))
+            {
+                return true;
+            }
         }
         return false;
     }
@@ -107,7 +153,7 @@ public class Game{
         else return new ShapeSquare(row, column, color);
     }
     
-    public void addWall(){
+    public void addWallQueue(){
         if(walls.size() < 4){
             Wall new_wall = generateWall();
             if(!walls.isEmpty()){
@@ -121,7 +167,7 @@ public class Game{
     public Wall throwWall(){
         Wall w = walls.pollFirst();
         int column = (int)(Math.random()*12+3);  
-        w.setCenter(new Position(2, column));
+        w.setCenter(new Position(0, column));
         w.recalculateWall();
         return w;
     }
@@ -131,16 +177,17 @@ public class Game{
             currentWall.runBottom();
             return true;
         }
+        verifyGameOver();
         return false;
     }
     
     public void runLeftCurrentWall(){
-        if(!currentWall.shockColumn(0))
+        if((!currentWall.shockColumn(0) && !sideCrash(false)))
             currentWall.runLeft();
     }
     
     public void runRightCurrentWall(){
-        if(!currentWall.shockColumn(LIMIT_COLUMN-1))
+        if(!currentWall.shockColumn(LIMIT_COLUMN-1) && !sideCrash(true))
             currentWall.runRight();
     }
     
@@ -171,7 +218,7 @@ public class Game{
         }
     }
     
-    private void updateBoard(){
+    private synchronized void updateBoard(){
         board = new Element[LIMIT_ROW][LIMIT_COLUMN];
         for(Wall w: wallsInBoard){
             for(Block b: w.getBlocks()){
@@ -180,7 +227,7 @@ public class Game{
         }
     }
     
-    private ArrayList<Integer> getRowsClear(){
+    private synchronized ArrayList<Integer> getRowsClear(){
         ArrayList<Integer> rows = new ArrayList<Integer>();
         for(int f=0; f<board.length; f++){
             boolean verify = false;
@@ -198,7 +245,7 @@ public class Game{
         return rows;
     }
     
-    public int clearBlocks(){
+    public synchronized int clearBlocks(){
         int clear = 0;
         ArrayList<Integer> rowsForClear = getRowsClear();
         ArrayList<Wall> clone = new ArrayList<Wall>();
@@ -233,12 +280,19 @@ public class Game{
         }
     }
     
-    public boolean gameOver(){
-        for(Wall w: wallsInBoard){
-            for(Block b: w.getBlocks()){
-                if(b.getPositionInRow() == 0 && shocks()) return true;
-            }
+    private synchronized void verifyGameOver() {
+        for(Block block: currentWall.getBlocks()){
+            if (block.getPositionInRow() <= 1) game_over =  true; 
         }
-        return false;
+    }
+    //No funciona del todo bien
+    public boolean gameOver(){
+        return game_over;
+    }
+    
+    public synchronized void paintBoard(Graphics g) {
+        for(Wall w: wallsInBoard){
+            w.paint(g);
+        }
     }
 }
