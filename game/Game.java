@@ -53,7 +53,7 @@ public class Game{
     }
     
     public void init(){
-        for(int i=0; i<4; i++)
+        for(int i=0; i<5; i++)
             addWallQueue();
     }
     
@@ -199,7 +199,7 @@ public class Game{
     }
     
     public void addWallQueue(){
-        if(walls.size() < 4){
+        if(walls.size() < 5){
             Wall new_wall = generateWall();
             if(!walls.isEmpty()){
                 for(Wall w: walls)

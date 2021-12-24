@@ -24,21 +24,23 @@ public class LaminaCola extends JPanel{
                         game.addWallsInBoard(game.getCurrentWall());
                         if(!game.gameOver()) {
                             LaminaGame.score += 10;
-                            TetrisFrame.setScore();
                             game.setCurrentWall(game.throwWall());
                             game.addWallQueue();
                             int cant_clear = game.clearBlocks();
                             if(cant_clear != 0){
+                                LaminaGame.score += (100 * cant_clear);
                                 LaminaGame.line += cant_clear;
                                 TetrisFrame.setLine();
                                 game.runBottomAllWallsInBoard(cant_clear);
                             }
+                            TetrisFrame.setScore();
                             game.runShadowCurrentWall();
                         }
                         repaint();
                     }
                 }else{                
                     if(gameOver) {
+                        TetrisFrame.writeHightScore();
                         timer.cancel();
                         LaminaGame.line = 0;
                         LaminaGame.score = 0;
@@ -70,17 +72,36 @@ public class LaminaCola extends JPanel{
     
     public void paintComponent(Graphics g){
         super.paintComponent(g);
-        g.drawRoundRect(8, 228, 124, 354, 5, 5);
+        
+        g.drawRoundRect(8, 98, 124, 105, 5, 5);
         
         g.setColor(new Color(200, 191, 231));
-        g.fillRoundRect(10, 230, 120, 350, 5, 5);
+        g.fillRoundRect(10, 100, 120, 100, 5, 5);
         
         g.setColor(Color.BLACK);
-        g.drawRoundRect(10, 230, 120, 350, 5, 5);
+        g.drawRoundRect(10, 100, 120, 100, 5, 5);
         
         g.setColor(Color.GRAY);
-        g.drawRoundRect(9, 229, 122, 352, 5, 5);
+        g.drawRoundRect(9, 100, 122, 101, 5, 5);
+        
+        //*****************************
+        g.setColor(Color.BLACK);
+        g.drawRoundRect(8, 227, 124, 356, 5, 5);
+        
+        g.setColor(new Color(200, 191, 231));
+        g.fillRoundRect(10, 230, 120, 351, 5, 5);
+        
+        g.setColor(Color.BLACK);
+        g.drawRoundRect(10, 230, 120, 351, 5, 5);
+        
+        g.setColor(Color.GRAY);
+        g.drawRoundRect(9, 228, 122, 353, 5, 5);
+        
         for(Wall w: game.getWalls())
             w.paint(g);
+            
+        g.setFont(new Font("Arial", Font.BOLD, 20));
+        g.setColor(Color.BLACK);
+        g.drawString("NEXT", 45, 125);
     }
 }

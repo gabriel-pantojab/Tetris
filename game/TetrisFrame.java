@@ -12,11 +12,15 @@ public class TetrisFrame extends JFrame{
     private LaminaGame lamina_game;
     private LaminaCola cola;
     private JButton start, pause, restart, help, actDesSombra;
-    public static JLabel line, score;
+    public static JLabel line, score, scoreMax, hightScore;
+    
+    private static BufferedReader lector;
+    private static BufferedWriter escritor;
     
     public TetrisFrame(){
         setLayout(new BorderLayout());
         setBounds(0, 0, 640, 650);
+
         game = new Game();
         lamina_game = new LaminaGame(game);
         cola = new LaminaCola(game);
@@ -53,6 +57,16 @@ public class TetrisFrame extends JFrame{
         line    = new JLabel("Line: "+LaminaGame.line);
         score   = new JLabel("Score: "+LaminaGame.score);
         
+        scoreMax   = new JLabel("Hight Score:");
+        try{
+            lector = new BufferedReader(new FileReader("./storage/scoreMax.txt"));
+            hightScore = new JLabel(lector.readLine());
+            lector.close();
+        }catch(IOException io) {
+            hightScore = new JLabel("Not Found");
+            //System.out.println("Error en la lectura");
+        }
+        
         
         start.setBounds(30, 100, 70, 30);
         pause.setBounds(30, 150, 70, 30);
@@ -61,6 +75,9 @@ public class TetrisFrame extends JFrame{
         actDesSombra.setBounds(15, 300, 100, 30);
         line.setBounds(10, 350, 200, 30);
         score.setBounds(10, 380, 200, 30);
+        
+        scoreMax.setBounds(10, 410, 300, 30);
+        hightScore.setBounds(30, 440, 200, 30);
         
         start.addActionListener(managerButtons);
         pause.addActionListener(managerButtons);
@@ -74,6 +91,11 @@ public class TetrisFrame extends JFrame{
         score.setFont(new Font("Arial", Font.BOLD, 15));
         score.setForeground(Color.WHITE);
         
+        scoreMax.setFont(new Font("Arial", Font.BOLD, 15));
+        scoreMax.setForeground(Color.WHITE);
+        hightScore.setFont(new Font("Arial", Font.BOLD, 15));
+        hightScore.setForeground(Color.WHITE);
+        
         JPanel panel_buttons = new JPanel();
         panel_buttons.setLayout(null);
         panel_buttons.setBackground(Color.BLACK);
@@ -86,8 +108,36 @@ public class TetrisFrame extends JFrame{
         panel_buttons.add(help);
         panel_buttons.add(actDesSombra);
         
+        panel_buttons.add(scoreMax);
+        panel_buttons.add(hightScore);
+        
         
         add(panel_buttons, BorderLayout.WEST);
+    }
+    
+        public static void setHightScore(){
+        try{
+            lector = new BufferedReader(new FileReader("./storage/scoreMax.txt"));
+            hightScore.setText(lector.readLine());
+            lector.close();
+        }catch (IOException io){
+        }
+    }
+    
+    public static void writeHightScore() {
+        try{
+            lector = new BufferedReader(new FileReader("./storage/scoreMax.txt"));
+            int puntuacionA = Integer.parseInt(lector.readLine());
+            int puntuacionB = LaminaGame.score;
+            lector.close();
+            if (puntuacionB > puntuacionA) {
+                escritor = new BufferedWriter(new FileWriter("./storage/scoreMax.txt"));
+                escritor.write(""+puntuacionB);
+                escritor.close();
+                setHightScore();
+            }
+        }catch (IOException io){
+        }
     }
     
     private class ManagerButtons implements ActionListener {
