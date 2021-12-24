@@ -24,7 +24,7 @@ class LaminaWall extends JPanel{
     private Wall te, rect, ele, zeta, square, jota, ese, cross;
     public LaminaWall(){
         te     = new ShapeT(3, 3, Color.GRAY);
-        rect   = new ShapeRect(3, 10, Color.RED);
+        rect   = new ShapeRect(3, 10, new Color(1, 0, 0, 0.2f));
         ele    = new ShapeEle(3, 17, Color.ORANGE);
         zeta   = new ShapeZeta(3, 24, Color.BLUE);
         square = new ShapeSquare(3, 31, Color.GREEN);
@@ -37,16 +37,16 @@ class LaminaWall extends JPanel{
     
     public void paintComponent(Graphics g){
         super.paintComponent(g);
-        cross.paintBorder(g);
-        te.paintBorder(g);
+        cross.paint(g);
+        te.paint(g);
         g.setColor(Color.RED);
         g.drawLine(0, 100, 1000, 100);
-        rect.paintBorder(g);
-        ele.paintBorder(g);
-        zeta.paintBorder(g);
-        jota.paintBorder(g);
-        ese.paintBorder(g);
-        square.paintBorder(g);
+        rect.paint(g);
+        ele.paint(g);
+        zeta.paint(g);
+        jota.paint(g);
+        ese.paint(g);
+        square.paint(g);
     }
     public void start(){
         Thread h = new Thread(){

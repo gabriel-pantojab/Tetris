@@ -10,18 +10,20 @@ public class Game{
     private LinkedList<Wall> walls;
     private Element board[][];
     private ArrayList<Wall> wallsInBoard;
-    private Wall currentWall;
-    private boolean en_juego, pause, game_over;
-    private final Random random = new Random();
     
+    private boolean en_juego, pause, game_over, activar_sombra;
+    
+    private Wall currentWall;
     private Wall shadowCurrentWall;
     
-    private int row_limit;
+    private int row_limit; //guarda la informacion de cuantas filas se debe borrar
 
+    private final Random random = new Random();
     private final int LIMIT_ROW    = 28;
     private final int LIMIT_COLUMN = 16;
     private final Color[] colors   = {new Color(0, 0, 200), new Color(0, 200, 0), new Color(128, 0, 255), new Color(255, 127, 39), 
-                                       new Color(200, 0, 0), Color.ORANGE, new Color(185, 122, 87), new Color(64, 128, 128)};
+                                       new Color(200, 0, 0), Color.ORANGE, new Color(185, 122, 87), new Color(64, 128, 128),
+                                        new Color(251, 49, 201)};
     
     public Game(){
         walls = new LinkedList<Wall>();   
@@ -29,6 +31,7 @@ public class Game{
         wallsInBoard = new ArrayList<Wall>();
         row_limit = 0;
         game_over = false;
+        activar_sombra = false;
     }
     
     public void restart(){
@@ -38,6 +41,7 @@ public class Game{
         currentWall = null;
         row_limit = 0;
         game_over = false;
+        activar_sombra = false;
     }
     
     private void clearBoard(){
@@ -70,6 +74,20 @@ public class Game{
         pause = false;
     }
     
+    public void activarSombra() {
+        activar_sombra = true;
+        initShadowCurrentWall();
+    }
+    
+    public void desactivarSombra() {
+        activar_sombra = false;
+        shadowCurrentWall = null;
+    }
+    
+    public boolean conSombra() {
+        return activar_sombra;
+    }
+    
     public boolean isGame(){
         return en_juego;
     }
@@ -80,6 +98,33 @@ public class Game{
     
     public LinkedList<Wall> getWalls(){
         return walls;
+    }
+    
+    public ArrayList<Wall> getWallsInBoard(){
+        return wallsInBoard;
+    }
+    
+    public Wall getCurrentWall(){
+        return currentWall;
+    }
+    
+    public Wall getshadowCurrentWall(){
+        return shadowCurrentWall;
+    }
+    
+    public boolean gameOver(){
+        return game_over;
+    }
+    
+    public void setCurrentWall(Wall new_wall){
+        currentWall = new_wall;
+    }
+    
+    public void initShadowCurrentWall() {
+        if (currentWall != null) {
+            shadowCurrentWall = currentWall.clone();
+            runShadowCurrentWall();
+        }
     }
     
     private synchronized  boolean shocks(Wall nWall){
@@ -106,11 +151,11 @@ public class Game{
         for(Wall wall: wallsInBoard){
             for(Block block: wall.getBlocks()){
                 if (type) {
-                    if (sideCrashRight(block)) {
+                    if (sideCrash(block, true)) {
                         return true;
                     }
                 }else {
-                    if (sideCrashLeft(block)) {
+                    if (sideCrash(block, false)) {
                         return true;
                     }
                 }
@@ -119,23 +164,20 @@ public class Game{
         return false;
     }
     
-    private boolean sideCrashLeft(Block block) {
+    private boolean sideCrash(Block block, boolean right) {
         for(Block b: currentWall.getBlocks()){
             if (((Math.abs(b.getPositionInColumn()-block.getPositionInColumn()) == 1) && 
-            (b.getPositionInRow() == block.getPositionInRow())) && (block.getPositionInColumn() < b.getPositionInColumn()))
+            (b.getPositionInRow() == block.getPositionInRow())))
             {
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    private boolean sideCrashRight(Block block) {
-        for(Block b: currentWall.getBlocks()){
-            if (((Math.abs(b.getPositionInColumn()-block.getPositionInColumn()) == 1) && 
-            (b.getPositionInRow() == block.getPositionInRow())) && (block.getPositionInColumn() > b.getPositionInColumn()))
-            {
-                return true;
+                if(right) {
+                    if(block.getPositionInColumn() > b.getPositionInColumn()) {
+                        return true;
+                    }
+                }else{
+                    if(block.getPositionInColumn() < b.getPositionInColumn()) {
+                        return true;
+                    }
+                }
             }
         }
         return false;
@@ -228,15 +270,6 @@ public class Game{
             currentWall.rotateRight();
     }
     
-    public void setCurrentWall(Wall new_wall){
-        currentWall = new_wall;
-    }
-    
-    public void initShadowCurrentWall() {
-        shadowCurrentWall = currentWall.clone();
-        runShadowCurrentWall();
-    }
-    
     public synchronized void addWallsInBoard(Wall w){
         wallsInBoard.add(w);
         try{
@@ -294,18 +327,6 @@ public class Game{
         return clear;
     }
     
-    public ArrayList<Wall> getWallsInBoard(){
-        return wallsInBoard;
-    }
-    
-    public Wall getCurrentWall(){
-        return currentWall;
-    }
-    
-    public Wall getshadowCurrentWall(){
-        return shadowCurrentWall;
-    }
-    
     public void runBottomAllWallsInBoard(int cant){
         for(Wall w: wallsInBoard){
             w.runBottom(row_limit, cant); 
@@ -317,21 +338,13 @@ public class Game{
             if (block.getPositionInRow() < 1) game_over =  true; 
         }
     }
-
-    public boolean gameOver(){
-        return game_over;
-    }
     
     public synchronized void paintBoard(Graphics g) {
         for(Wall w: wallsInBoard){
             for (Block b : w.getBlocks()) {
-                if (b.getPositionInRow() >= 0) {
-                    b.paint(g);
-                }else {
-                    b.paintBorder(g);
-                }
+                if (b.getPositionInRow() >= 0) b.paint(g);
+                else b.paintBorder(g);
             }
-            //w.paint(g);
         }
     }
 }

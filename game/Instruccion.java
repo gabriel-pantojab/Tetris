@@ -15,7 +15,7 @@ public class Instruccion extends JDialog{
     private JLabelURL urlGit;
     
     private Container panel;
-    public Instruccion(Tetris f) {
+    public Instruccion(TetrisFrame f) {
         super(f, "Help", true);
         setLayout(new BorderLayout());
         setBounds(0, 0, 350, 260);

@@ -27,6 +27,8 @@ public class Block extends Element{
         g.drawRoundRect(x, y, 20, 20, 7, 7);
         g.setColor(new Color(192, 192, 192));
         g.drawRoundRect(x+1, y+1, 18, 18, 7, 7);
+        g.setColor(Color.WHITE);
+        g.drawRoundRect(x+3, y+3, 14, 14, 5, 5);
     }
     
     public void paintBorder(Graphics g){
@@ -45,6 +47,6 @@ public class Block extends Element{
     }
     
     public Block clone(){
-        return new Block(new Position(position.getRow(), position.getColumn()), color);
+        return new Block(new Position(position.getRow(), position.getColumn()), new Color(color.getRGB()));
     }
 }

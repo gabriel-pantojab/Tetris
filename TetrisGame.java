@@ -1,4 +1,4 @@
-import game.Tetris;
+import game.TetrisFrame;
 /**
  * Write a description of class Tetris here.
  *
@@ -6,7 +6,7 @@ import game.Tetris;
  * @version (a version number or a date)
  */
 public class TetrisGame {
-    public static void main(String args[]) {
-        new Tetris();
+    public static void main(String[] args) {
+        new TetrisFrame();
     }
 }
