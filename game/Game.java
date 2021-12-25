@@ -41,7 +41,6 @@ public class Game{
         currentWall = null;
         row_limit = 0;
         game_over = false;
-        activar_sombra = false;
     }
     
     private void clearBoard(){
