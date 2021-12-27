@@ -1,4 +1,4 @@
-import game.TetrisFrame;
+import game.*;
 /**
  * Write a description of class Tetris here.
  *

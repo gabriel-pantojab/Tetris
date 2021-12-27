@@ -63,7 +63,7 @@ public class LaminaGame extends JPanel{
         
         if (game.isPause()) {
             g.setFont(new Font("Arial", Font.BOLD, 27));
-            g.setColor(Color.RED);
+            g.setColor(Color.BLACK);
             g.drawString("ENTER para continuar", 33, 300);
         }
     }

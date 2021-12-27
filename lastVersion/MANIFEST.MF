@@ -1,4 +1,4 @@
-Manifest-Version: 1.5
+Manifest-Version: 1.7
 Created-By: Gabriel Pantoja
 Main-Class: TetrisGame
 X-COMMENT: Se requiere jdk o jre
