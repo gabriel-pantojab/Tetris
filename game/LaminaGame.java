@@ -21,14 +21,6 @@ public class LaminaGame extends JPanel{
     public void init(){
         setFocusable(true);
         requestFocusInWindow();
-        java.util.Timer timer = new java.util.Timer();
-        java.util.TimerTask task = new java.util.TimerTask(){
-            public void run(){
-                repaint();
-                if(!game.isGame()) timer.cancel();
-            }
-        };
-        timer.schedule(task, 0, 10);
     }
     
     public void paintComponent(Graphics g){
@@ -91,6 +83,7 @@ public class LaminaGame extends JPanel{
                     game.resume();
                 }
             }
+            repaint();
         }
         public void keyReleased(KeyEvent e){}
         public void keyTyped(KeyEvent e){}

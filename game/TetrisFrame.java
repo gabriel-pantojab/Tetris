@@ -2,7 +2,7 @@ package game;
 import javax.swing.*;
 import java.awt.*;
 import Elements.*;
-import java.util.ArrayList;
+import java.util.*;
 import java.awt.event.*;
 import java.io.*;
 
@@ -17,6 +17,9 @@ public class TetrisFrame extends JFrame{
     private static BufferedReader lector;
     private static BufferedWriter escritor;
     
+    private java.util.Timer timer;
+    private java.util.TimerTask task;
+    
     public TetrisFrame(){
         setLayout(new BorderLayout());
         setBounds(0, 0, 640, 650);
@@ -24,6 +27,7 @@ public class TetrisFrame extends JFrame{
         game = new Game();
         lamina_game = new LaminaGame(game);
         cola = new LaminaCola(game);
+        
         add(lamina_game, BorderLayout.CENTER);
         add(cola, BorderLayout.EAST);
         createButtons();
@@ -32,6 +36,60 @@ public class TetrisFrame extends JFrame{
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
         init();
+    }
+    
+    private void play() {
+        timer = new java.util.Timer();
+        task = new java.util.TimerTask(){
+            public void run() {
+                boolean gameOver = game.gameOver();
+                if(game.isGame() && !game.isPause() && !gameOver){
+                    boolean run = game.runBottomCurrentWall();
+                    if(!run){
+                        game.addWallsInBoard(game.getCurrentWall());
+                        if(!gameOver) {
+                            throwWall();
+                        }
+                        cola.repaint();
+                    }
+                    lamina_game.repaint();
+                }else{
+                    if(gameOver) {
+                        gameOver();
+                    }
+                }
+            }
+        };
+        timer.schedule(task, 0, 500);
+    }
+    
+    private void throwWall() {
+        LaminaGame.score += 10;
+        game.setCurrentWall(game.throwWall());
+        game.addWallQueue();
+        int cant_clear = game.clearBlocks();
+        if(cant_clear != 0){
+            LaminaGame.score += (100 * cant_clear);
+            LaminaGame.line += cant_clear;
+            TetrisFrame.setLine();
+            game.runBottomAllWallsInBoard(cant_clear);
+        }
+        TetrisFrame.setScore();
+        game.runShadowCurrentWall();
+    }
+    
+    private void gameOver() {
+        TetrisFrame.writeHightScore();
+        timer.cancel();
+        LaminaGame.line = 0;
+        LaminaGame.score = 0;
+        JOptionPane.showMessageDialog(TetrisFrame.this, "GAME OVER!!!");
+        TetrisFrame.setLine();
+        TetrisFrame.setScore();
+        game.end();
+        game.restart();
+        game.init();
+        cola.repaint();        
     }
     
     public static void setLine(){
@@ -151,7 +209,8 @@ public class TetrisFrame extends JFrame{
                     cola.repaint();
                     game.begin();
                     lamina_game.init();
-                    cola.init();
+                    //cola.init();
+                    play();
                 }            
             }else if (boton.equals(pause)) {
                 if(game.isGame() && !game.isPause()){
@@ -161,11 +220,13 @@ public class TetrisFrame extends JFrame{
             }else if (boton.equals(restart)) {
                 if (game.isGame()) {
                     game.pause();
+                    timer.cancel();
                 }
                 int opcion = JOptionPane.showConfirmDialog(TetrisFrame.this, "¿Esta seguro de reiniciar el juego?", "Warning", JOptionPane.OK_CANCEL_OPTION);
                 if(opcion == JOptionPane.YES_OPTION) {
                     if (game.isGame()) {
                         cola.restart();
+                        //lamina_game.repaint();
                     }
                 }
                 lamina_game.requestFocusInWindow();
@@ -195,6 +256,7 @@ public class TetrisFrame extends JFrame{
                     }
                 }
             }
+            lamina_game.repaint();
         }
     }
 }

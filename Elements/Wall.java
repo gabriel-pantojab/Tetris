@@ -31,7 +31,7 @@ public abstract class Wall{
     
     public void rotateLeft(){
         for(Block block: blocks){
-            Position position_rotate = computeRotatePosition(block.getPosition(), false);
+            Position position_rotate = computeRotatePosition(block.getPosition(), RotateDirection.LEFT);
             int new_row    = position_rotate.getRow() + center_position.getRow();
             int new_column = position_rotate.getColumn() + center_position.getColumn();
             block.setPosition(new Position(new_row, new_column));
@@ -40,17 +40,17 @@ public abstract class Wall{
     
     public void rotateRight(){
         for(Block block: blocks){
-            Position position_rotate = computeRotatePosition(block.getPosition(), true);
+            Position position_rotate = computeRotatePosition(block.getPosition(), RotateDirection.RIGHT);
             int new_row    = position_rotate.getRow() + center_position.getRow();
             int new_column = position_rotate.getColumn() + center_position.getColumn();
             block.setPosition(new Position(new_row, new_column));
         }
     }
     
-    private Position computeRotatePosition(Position p, boolean horario){
+    private Position computeRotatePosition(Position p, RotateDirection direction){
         int row_origen    = p.getRow() - center_position.getRow();
         int column_origen = p.getColumn() - center_position.getColumn();
-        if(horario) return new Position(column_origen, -row_origen);
+        if(direction == RotateDirection.RIGHT) return new Position(column_origen, -row_origen);
         else return new Position(-column_origen, row_origen);
     }
     
