@@ -75,11 +75,11 @@ public class LaminaGame extends JPanel{
                     game.runRightCurrentWall();
                 else if(e.getKeyCode() == KeyEvent.VK_LEFT)
                     game.runLeftCurrentWall();
-                else if(e.getKeyCode() == KeyEvent.VK_A)
+                else if(e.getKeyCode() == KeyEvent.VK_A){
                     game.rotateLeftCurrentWall();
-                else if(e.getKeyCode() == KeyEvent.VK_S)
+                }else if(e.getKeyCode() == KeyEvent.VK_S){
                     game.rotateRightCurrentWall();
-                else if(e.getKeyCode() == KeyEvent.VK_DOWN)
+                }else if(e.getKeyCode() == KeyEvent.VK_DOWN)
                     game.runBottomCurrentWall();
                 else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
                     while(game.runBottomCurrentWall());

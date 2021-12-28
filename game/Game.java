@@ -146,15 +146,15 @@ public class Game{
         return false;
     }
     
-    private synchronized  boolean sideCrash(boolean type){
+    private synchronized  boolean sideCrash(RotateDirection direction){
         for(Wall wall: wallsInBoard){
             for(Block block: wall.getBlocks()){
-                if (type) {
-                    if (sideCrash(block, true)) {
+                if (direction == RotateDirection.RIGHT) {
+                    if (sideCrash(block, direction)) {
                         return true;
                     }
                 }else {
-                    if (sideCrash(block, false)) {
+                    if (sideCrash(block, direction)) {
                         return true;
                     }
                 }
@@ -163,12 +163,12 @@ public class Game{
         return false;
     }
     
-    private boolean sideCrash(Block block, boolean right) {
+    private boolean sideCrash(Block block, RotateDirection direction) {
         for(Block b: currentWall.getBlocks()){
             if (((Math.abs(b.getPositionInColumn()-block.getPositionInColumn()) == 1) && 
             (b.getPositionInRow() == block.getPositionInRow())))
             {
-                if(right) {
+                if(direction == RotateDirection.RIGHT) {
                     if(block.getPositionInColumn() > b.getPositionInColumn()) {
                         return true;
                     }
@@ -246,27 +246,68 @@ public class Game{
     }
     
     public void runLeftCurrentWall(){
-        if((!currentWall.shockColumn(0) && !sideCrash(false)))
+        if((!currentWall.shockColumn(0) && !sideCrash(RotateDirection.LEFT)))
             currentWall.runLeft();
     }
     
     public void runRightCurrentWall(){
-        if(!currentWall.shockColumn(LIMIT_COLUMN-1) && !sideCrash(true))
+        if(!currentWall.shockColumn(LIMIT_COLUMN-1) && !sideCrash(RotateDirection.RIGHT))
             currentWall.runRight();
     }
     
-    public void rotateLeftCurrentWall(){
-        Wall clone_currentWall = currentWall.clone();
-        clone_currentWall.rotateLeft();
-        if(!clone_currentWall.shockColumn(LIMIT_COLUMN-1) && !clone_currentWall.shockColumn(0) && !clone_currentWall.shockRow(LIMIT_ROW-1))
-            currentWall.rotateLeft();
+    private boolean crashWithWallsInBoard(Wall clone_currentWall) {
+        for(Block b : clone_currentWall.getBlocks()) {
+            int row, column;
+            row = b.getPositionInRow();
+            column = b.getPositionInColumn();
+            if (validarPosiciones(row, column)){
+                if (board[row][column] != null) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+    private boolean validarPosiciones(int row, int column) {
+        return (row >= 0 && column >= 0) && (row < LIMIT_ROW && column < LIMIT_COLUMN);
     }
     
     public void rotateRightCurrentWall(){
         Wall clone_currentWall = currentWall.clone();
         clone_currentWall.rotateRight();
-        if(!clone_currentWall.shockColumn(LIMIT_COLUMN-1) && !clone_currentWall.shockColumn(0) && !clone_currentWall.shockRow(LIMIT_ROW-1))
-            currentWall.rotateRight();
+        controlRotacion(clone_currentWall, RotateDirection.RIGHT);
+    }
+    
+    public void rotateLeftCurrentWall(){
+        Wall clone_currentWall = currentWall.clone();
+        clone_currentWall.rotateLeft();
+        controlRotacion(clone_currentWall, RotateDirection.LEFT);
+    }
+    
+    private void controlRotacion(Wall clone_currentWall, RotateDirection direction) {
+        if(rotateCondition(clone_currentWall)) {
+            if(!crashWithWallsInBoard(clone_currentWall)){
+                if (direction == RotateDirection.RIGHT) currentWall.rotateRight();
+                else currentWall.rotateLeft();
+            }else{
+                clone_currentWall.runTop(1);
+                if (!crashWithWallsInBoard(clone_currentWall)) {
+                    currentWall.runTop(1);
+                    if (direction == RotateDirection.RIGHT) currentWall.rotateRight();
+                    else currentWall.rotateLeft();
+                }else{
+                    currentWall.runTop(2);
+                    if (direction == RotateDirection.RIGHT) currentWall.rotateRight();
+                    else currentWall.rotateLeft();
+                }
+            }
+        }
+    }
+    
+    private boolean rotateCondition(Wall clone_currentWall) {
+        return !clone_currentWall.shockColumn(LIMIT_COLUMN-1) && !clone_currentWall.shockColumn(0) 
+                            && !clone_currentWall.shockRow(LIMIT_ROW-1);
     }
     
     public synchronized void addWallsInBoard(Wall w){
