@@ -17,15 +17,14 @@ public class Game{
     private Wall shadowCurrentWall;
     
     private int row_limit; //guarda la informacion de cuantas filas se debe borrar
-
-    private final Random random = new Random();
+    
+    private WallFactory factory;
+    
     private final int LIMIT_ROW    = 28;
     private final int LIMIT_COLUMN = 16;
-    private final Color[] colors   = {new Color(0, 0, 200), new Color(0, 200, 0), new Color(128, 0, 255), new Color(255, 127, 39), 
-                                       new Color(200, 0, 0), Color.ORANGE, new Color(185, 122, 87), new Color(64, 128, 128),
-                                        new Color(251, 49, 201)};
     
     public Game(){
+        factory = new RandomWallFactory();
         walls = new LinkedList<Wall>();   
         board = new Element[28][16];
         wallsInBoard = new ArrayList<Wall>();
@@ -182,24 +181,9 @@ public class Game{
         return false;
     }
     
-    private Wall generateWall(){
-        int type    = random.nextInt(7)+1;
-        int column  = 2;
-        int row     = 27;
-        Color color = colors[random.nextInt(colors.length)];
-        
-        if(type == 1) return new ShapeEle(row, column, color);
-        if(type == 2) return new ShapeJ(row, column, color);
-        if(type == 3) return new ShapeT(row, column, color);
-        if(type == 4) return new ShapeZeta(row, column, color);
-        if(type == 5) return new ShapeS(row, column, color);
-        if(type == 6) return new ShapeRect(row, column, color);
-        else return new ShapeSquare(row, column, color);
-    }
-    
     public void addWallQueue(){
         if(walls.size() < 5){
-            Wall new_wall = generateWall();
+            Wall new_wall = factory.createWall();
             if(!walls.isEmpty()){
                 for(Wall w: walls)
                     w.runTop(5);
