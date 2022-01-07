@@ -82,6 +82,7 @@ public class LaminaGame extends JPanel{
             if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                 if(game.isPause()) {
                     game.resume();
+                    TetrisFrame.time.resume();
                 }
             }
             repaint();

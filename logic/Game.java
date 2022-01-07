@@ -10,6 +10,7 @@ public class Game{
     private LinkedList<Wall> walls;
     private Element board[][];
     private ArrayList<Wall> wallsInBoard;
+    private ArrayList<Wall[]> topeWalls;
     
     private boolean en_juego, pause, game_over, activar_sombra;
     
@@ -23,7 +24,10 @@ public class Game{
     private final int LIMIT_ROW    = 28;
     private final int LIMIT_COLUMN = 16;
     
+    private int tope = 1;
+    
     public Game(){
+        topeWalls = new ArrayList<Wall[]>();
         factory = new RandomWallFactory();
         walls = new LinkedList<Wall>();   
         board = new Element[28][16];
@@ -368,6 +372,11 @@ public class Game{
             for (Block b : w.getBlocks()) {
                 if (b.getPositionInRow() >= 0) b.paint(g);
                 else b.paintBorder(g);
+            }
+        }
+        for(Wall[] w1 : topeWalls) {
+            for(Wall w2 : w1) {
+                w2.paint(g);
             }
         }
     }

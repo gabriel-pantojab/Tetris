@@ -13,9 +13,12 @@ public class TetrisFrame extends JFrame{
     private LaminaCola cola;
     private JButton start, pause, restart, help, actDesSombra;
     public static JLabel line, score, scoreMax, hightScore;
+    public static JLabelChronometer time;
     
     private static BufferedReader lector;
     private static BufferedWriter escritor;
+    
+    private static int minutes;
     
     private java.util.Timer timer;
     private java.util.TimerTask task;
@@ -24,6 +27,7 @@ public class TetrisFrame extends JFrame{
         setLayout(new BorderLayout());
         setBounds(0, 0, 640, 650);
 
+        minutes = 0;
         game = new Game();
         lamina_game = new LaminaGame(game);
         cola = new LaminaCola(game);
@@ -56,9 +60,11 @@ public class TetrisFrame extends JFrame{
                 }else{
                     if(gameOver) {
                         timer.cancel();
+                        time.pause();
                         gameOver();
                     }
                 }
+                minutes = time.getChronometer().getMinutes();
             }
         };
         timer.schedule(task, 0, 500);
@@ -84,6 +90,7 @@ public class TetrisFrame extends JFrame{
         LaminaGame.line = 0;
         LaminaGame.score = 0;
         JOptionPane.showMessageDialog(TetrisFrame.this, "GAME OVER!!!");
+        time.stop();
         TetrisFrame.setLine();
         TetrisFrame.setScore();
         game.end();
@@ -115,6 +122,7 @@ public class TetrisFrame extends JFrame{
         actDesSombra = new JButton("Activar");
         line    = new JLabel("Line: "+LaminaGame.line);
         score   = new JLabel("Score: "+LaminaGame.score);
+        time    = new JLabelChronometer();
         
         scoreMax   = new JLabel("Hight Score:");
         try{
@@ -135,6 +143,8 @@ public class TetrisFrame extends JFrame{
         line.setBounds(10, 350, 200, 30);
         score.setBounds(10, 380, 200, 30);
         
+        time.setBounds(30, 50, 300, 30);
+        
         scoreMax.setBounds(10, 410, 300, 30);
         hightScore.setBounds(30, 440, 200, 30);
         
@@ -143,6 +153,9 @@ public class TetrisFrame extends JFrame{
         restart.addActionListener(managerButtons);
         help.addActionListener(managerButtons);
         actDesSombra.addActionListener(managerButtons);
+        
+        time.setFont(new Font("Arial", Font.BOLD, 15));
+        time.setForeground(Color.WHITE);
         
         line.setFont(new Font("Arial", Font.BOLD, 15));
         line.setForeground(Color.WHITE);
@@ -159,6 +172,7 @@ public class TetrisFrame extends JFrame{
         panel_buttons.setLayout(null);
         panel_buttons.setBackground(Color.BLACK);
         panel_buttons.setPreferredSize(new Dimension(130, 600));
+        panel_buttons.add(time);
         panel_buttons.add(start);
         panel_buttons.add(pause);
         panel_buttons.add(restart);
@@ -212,34 +226,43 @@ public class TetrisFrame extends JFrame{
                     lamina_game.init();
                     //cola.init();
                     play();
+                    time.start();
                 }            
             }else if (boton.equals(pause)) {
                 if(game.isGame() && !game.isPause()){
                     game.pause();
+                    time.pause();
                     lamina_game.requestFocusInWindow();
                 }
             }else if (boton.equals(restart)) {
                 if (game.isGame()) {
                     game.pause();
+                    time.pause();
                     timer.cancel();
                 }
                 int opcion = JOptionPane.showConfirmDialog(TetrisFrame.this, "¿Esta seguro de reiniciar el juego?", "Warning", JOptionPane.OK_CANCEL_OPTION);
                 if(opcion == JOptionPane.YES_OPTION) {
                     if (game.isGame()) {
                         cola.restart();
+                        time.stop();
                         //lamina_game.repaint();
                     }
+                }
+                if(time.getChronometer().running()) {
+                    time.resume();
                 }
                 lamina_game.requestFocusInWindow();
             }else if (boton.equals(help)) {
                 if (game.isGame()) {
                     game.pause();
+                    time.pause();
                 }
                 new Instruccion(TetrisFrame.this);
                 lamina_game.requestFocusInWindow();
             }else if (boton.equals(actDesSombra)) {
                 if (game.isGame()) {
                     game.pause();
+                    time.pause();
                 }
                 String msg = "¿Activar sombra?";
                 if (game.conSombra()) {
