@@ -1,8 +1,9 @@
-package game;
+package visual;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import logic.*;
 
 /**
  * Write a description of class Instruccion here.

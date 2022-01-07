@@ -1,7 +1,8 @@
-package game;
+package visual;
 import javax.swing.*;
 import java.awt.*;
 import Elements.*;
+import logic.*;
 
 public class LaminaCola extends JPanel{
     private Game game;

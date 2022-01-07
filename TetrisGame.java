@@ -1,4 +1,4 @@
-import game.*;
+import visual.*;
 /**
  * Write a description of class Tetris here.
  *

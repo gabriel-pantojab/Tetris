@@ -2,6 +2,10 @@ package Elements;
 import java.awt.Color;
 
 public class ShapeSquare extends Wall{
+    public ShapeSquare() {
+        super();
+    }
+    
     public ShapeSquare(int row_center, int column_center, Color color){
         super(4, row_center, column_center, color);
         createWall(row_center, column_center);

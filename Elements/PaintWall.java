@@ -3,8 +3,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class ProofPaintWall extends JFrame{
-    public ProofPaintWall(){
+public class PaintWall extends JFrame{
+    public PaintWall(){
         super("Animate Block");
         setBounds(0, 0, 1000, 600);
         setLocationRelativeTo(null);
@@ -16,7 +16,7 @@ public class ProofPaintWall extends JFrame{
     }
     
     public static void main(String args[]){
-        new ProofPaintWall();
+        new PaintWall();
     }
 }
 

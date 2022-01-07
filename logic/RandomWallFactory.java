@@ -1,4 +1,4 @@
-package game;
+package logic;
 
 import Elements.*;
 import java.awt.Color;

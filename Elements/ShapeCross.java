@@ -3,6 +3,10 @@ import java.awt.Color;
 
 
 public class ShapeCross extends Wall{
+    public ShapeCross() {
+        super();
+    }
+    
     public ShapeCross(int row_center, int column_center, Color color){
         super(5, row_center, column_center, color);
         createWall(row_center, column_center);

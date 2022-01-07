@@ -1,11 +1,11 @@
-package game;
+package visual;
 import javax.swing.*;
 import java.awt.*;
 import Elements.*;
 import java.util.*;
 import java.awt.event.*;
 import java.io.*;
-
+import logic.*;
 
 public class TetrisFrame extends JFrame{
     private Game game;
@@ -45,7 +45,7 @@ public class TetrisFrame extends JFrame{
                 boolean gameOver = game.gameOver();
                 if(game.isGame() && !game.isPause() && !gameOver){
                     boolean run = game.runBottomCurrentWall();
-                    if(!run){
+                    if(!run && !game.gameOver()){
                         game.addWallsInBoard(game.getCurrentWall());
                         if(!gameOver) {
                             throwWall();
@@ -55,6 +55,7 @@ public class TetrisFrame extends JFrame{
                     lamina_game.repaint();
                 }else{
                     if(gameOver) {
+                        timer.cancel();
                         gameOver();
                     }
                 }
@@ -80,7 +81,6 @@ public class TetrisFrame extends JFrame{
     
     private void gameOver() {
         TetrisFrame.writeHightScore();
-        timer.cancel();
         LaminaGame.line = 0;
         LaminaGame.score = 0;
         JOptionPane.showMessageDialog(TetrisFrame.this, "GAME OVER!!!");
@@ -89,7 +89,8 @@ public class TetrisFrame extends JFrame{
         game.end();
         game.restart();
         game.init();
-        cola.repaint();        
+        cola.repaint();   
+        lamina_game.repaint();
     }
     
     public static void setLine(){

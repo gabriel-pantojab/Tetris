@@ -1,4 +1,4 @@
-package game;
+package visual;
 
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;

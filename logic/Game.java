@@ -1,4 +1,4 @@
-package game;
+package logic;
 import Elements.*;
 import java.util.LinkedList;
 import java.util.Random;
@@ -308,7 +308,7 @@ public class Game{
         for(Wall w: wallsInBoard){
             for(Block b: w.getBlocks()){
                 board[b.getPositionInRow()][b.getPositionInColumn()] = b;
-            }
+            }   
         }
     }
     

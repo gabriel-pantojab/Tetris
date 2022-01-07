@@ -12,6 +12,13 @@ public abstract class Wall{
     protected Position center_position;
     private final ReentrantLock lock = new ReentrantLock();
     
+    public Wall() {
+        this.length     = 4;
+        this.color      = Color.GRAY;
+        blocks          = new ArrayList();
+        center_position = new Position(0, 0);
+    }
+    
     public Wall(int length, int row_center, int column_center, Color color){
         this.length     = length;
         this.color      = color;
@@ -28,6 +35,10 @@ public abstract class Wall{
     
     protected abstract void createWall(int row_center, int column_center);
     public abstract Wall clone();
+    
+    public void setColor(Color color) {
+        this.color = color;
+    }
     
     public void rotateLeft(){
         for(Block block: blocks){
