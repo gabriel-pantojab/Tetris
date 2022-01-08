@@ -12,22 +12,27 @@ public class TetrisFrame extends JFrame{
     private LaminaGame lamina_game;
     private LaminaCola cola;
     private JButton start, pause, restart, help, actDesSombra;
-    public static JLabel line, score, scoreMax, hightScore;
+    public static JLabel line, score, scoreMax, hightScore, level;
     public static JLabelChronometer time;
     
     private static BufferedReader lector;
     private static BufferedWriter escritor;
     
-    private static int minutes;
-    
     private java.util.Timer timer;
     private java.util.TimerTask task;
     
+    private boolean winner = false;
+    
+    JPanel panel_buttons = new JPanel();
+    
     public TetrisFrame(){
+        panel_buttons.setLayout(null);
+        panel_buttons.setBackground(Color.BLACK);
+        panel_buttons.setPreferredSize(new Dimension(130, 600));
+        
         setLayout(new BorderLayout());
         setBounds(0, 0, 640, 650);
 
-        minutes = 0;
         game = new Game();
         lamina_game = new LaminaGame(game);
         cola = new LaminaCola(game);
@@ -35,11 +40,109 @@ public class TetrisFrame extends JFrame{
         add(lamina_game, BorderLayout.CENTER);
         add(cola, BorderLayout.EAST);
         createButtons();
+        crearLabels();
+        add(panel_buttons, BorderLayout.WEST);
         setLocationRelativeTo(null);
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
         init();
+    }
+    
+    private void crearLabels() {
+        line    = new JLabel("Line: "+LaminaGame.line);
+        score   = new JLabel("Score: "+LaminaGame.score);
+        level   = new JLabel("Level: "+game.getLevel().getLevel());
+        
+        time    = new JLabelChronometer("Time: "){
+            public void run() {
+                int t = this.getChronometer().getSeconds();
+                if(this.getChronometer().getMinutes() >= game.getLevel().timeInitTope()) {
+                    //mejorar
+                    if((t == 30 || t == 60) && (this.getChronometer().getMilliseconds() == 0)) {    
+                        game.throwTope();
+                    }
+                }
+            }
+        };
+        
+        scoreMax   = new JLabel("Hight Score:");
+        try{
+            lector = new BufferedReader(new FileReader("./storage/scoreMax.txt"));
+            hightScore = new JLabel(lector.readLine());
+            lector.close();
+        }catch(IOException io) {
+            hightScore = new JLabel("Not Found");
+            //System.out.println("Error en la lectura");
+        }
+        
+        //labels
+        time.setBounds(10, 50, 300, 30);
+        level.setBounds(10, 80, 200, 30);
+        line.setBounds(10, 110, 200, 30);
+        score.setBounds(10, 140, 200, 30);
+        scoreMax.setBounds(10, 170, 300, 30);
+        hightScore.setBounds(30, 200, 200, 30);
+        
+        level.setFont(new Font("Arial", Font.BOLD, 15));
+        level.setForeground(Color.WHITE);
+        
+        time.setFont(new Font("Arial", Font.BOLD, 15));
+        time.setForeground(Color.WHITE);
+        
+        line.setFont(new Font("Arial", Font.BOLD, 15));
+        line.setForeground(Color.WHITE);
+        
+        score.setFont(new Font("Arial", Font.BOLD, 15));
+        score.setForeground(Color.WHITE);
+        
+        scoreMax.setFont(new Font("Arial", Font.BOLD, 15));
+        scoreMax.setForeground(Color.WHITE);
+        
+        hightScore.setFont(new Font("Arial", Font.BOLD, 15));
+        hightScore.setForeground(Color.WHITE);
+        
+        panel_buttons.add(time);
+        panel_buttons.add(level);
+        panel_buttons.add(line);
+        panel_buttons.add(score);
+        panel_buttons.add(scoreMax);
+        panel_buttons.add(hightScore);
+    }
+    
+    private void createButtons(){
+        ManagerButtons managerButtons = new ManagerButtons();
+        
+        start   = new JButton("Start");
+        pause   = new JButton("Pause");
+        restart = new JButton("Restart");
+        help    = new JButton("Help");
+        actDesSombra = new JButton("Activar");
+        
+        //buttons
+        start.setBounds(15, 290, 100, 30);
+        pause.setBounds(15, 340, 100, 30);
+        help.setBounds(15, 390, 100, 30);
+        restart.setBounds(15, 440, 100, 30);
+        actDesSombra.setBounds(15, 490, 100, 30);
+        
+        start.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        pause.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        restart.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        help.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        actDesSombra.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
+        start.addActionListener(managerButtons);
+        pause.addActionListener(managerButtons);
+        restart.addActionListener(managerButtons);
+        help.addActionListener(managerButtons);
+        actDesSombra.addActionListener(managerButtons);
+        
+        panel_buttons.add(start);
+        panel_buttons.add(pause);
+        panel_buttons.add(restart);
+        panel_buttons.add(actDesSombra);
+        panel_buttons.add(help);
     }
     
     private void play() {
@@ -53,6 +156,7 @@ public class TetrisFrame extends JFrame{
                         game.addWallsInBoard(game.getCurrentWall());
                         if(!gameOver) {
                             throwWall();
+                            controlNextLevel();
                         }
                         cola.repaint();
                     }
@@ -64,10 +168,29 @@ public class TetrisFrame extends JFrame{
                         gameOver();
                     }
                 }
-                minutes = time.getChronometer().getMinutes();
+                try{
+                    Thread.sleep(game.getLevel().getDelay());
+                }catch(Exception e){}
             }
         };
-        timer.schedule(task, 0, 500);
+        timer.schedule(task, 0, 1);
+    }
+    
+    private void controlNextLevel() {
+        if (LaminaGame.score >= game.getLevel().getScore()) {
+            if(game.nextLevel()) {
+                time.restart();
+                level.setText("Level: "+game.getLevel().getLevel());
+            }else {
+                timer.cancel();
+                time.pause();
+                winner = true;
+                JOptionPane.showMessageDialog(TetrisFrame.this, "Winner!!!");
+                //Animacion de bloques cayendo :)
+                winnerAnimation();
+                gameOver();
+            }
+        }
     }
     
     private void throwWall() {
@@ -78,10 +201,10 @@ public class TetrisFrame extends JFrame{
         if(cant_clear != 0){
             LaminaGame.score += (100 * cant_clear);
             LaminaGame.line += cant_clear;
-            TetrisFrame.setLine();
+            line.setText("Line: "+LaminaGame.line);
             game.runBottomAllWallsInBoard(cant_clear);
         }
-        TetrisFrame.setScore();
+        score.setText("Score: "+LaminaGame.score);
         game.runShadowCurrentWall();
     }
     
@@ -89,106 +212,28 @@ public class TetrisFrame extends JFrame{
         TetrisFrame.writeHightScore();
         LaminaGame.line = 0;
         LaminaGame.score = 0;
-        JOptionPane.showMessageDialog(TetrisFrame.this, "GAME OVER!!!");
+        if(!winner) {
+            JOptionPane.showMessageDialog(TetrisFrame.this, "GAME OVER!!!");
+        }else winner = false;
         time.stop();
-        TetrisFrame.setLine();
-        TetrisFrame.setScore();
+        line.setText("Line: "+LaminaGame.line);
+        score.setText("Score: "+LaminaGame.score);
         game.end();
         game.restart();
-        game.init();
+        level.setText("Level: "+game.getLevel().getLevel());
         cola.repaint();   
         lamina_game.repaint();
-    }
-    
-    public static void setLine(){
-        line.setText("Line: "+LaminaGame.line);
-    }
-    
-    public static void setScore(){
-        score.setText("Score: "+LaminaGame.score);
     }
     
     public void init(){
         game.init();
     }
     
-    private void createButtons(){
-        ManagerButtons managerButtons = new ManagerButtons();
+    private void winnerAnimation() {
         
-        start   = new JButton("Start");
-        pause   = new JButton("Pause");
-        restart = new JButton("Restart");
-        help    = new JButton("Help");
-        actDesSombra = new JButton("Activar");
-        line    = new JLabel("Line: "+LaminaGame.line);
-        score   = new JLabel("Score: "+LaminaGame.score);
-        time    = new JLabelChronometer();
-        
-        scoreMax   = new JLabel("Hight Score:");
-        try{
-            lector = new BufferedReader(new FileReader("./storage/scoreMax.txt"));
-            hightScore = new JLabel(lector.readLine());
-            lector.close();
-        }catch(IOException io) {
-            hightScore = new JLabel("Not Found");
-            //System.out.println("Error en la lectura");
-        }
-        
-        
-        start.setBounds(30, 100, 70, 30);
-        pause.setBounds(30, 150, 70, 30);
-        restart.setBounds(20, 200, 90, 30);
-        help.setBounds(30, 250, 70, 30);
-        actDesSombra.setBounds(15, 300, 100, 30);
-        line.setBounds(10, 350, 200, 30);
-        score.setBounds(10, 380, 200, 30);
-        
-        time.setBounds(30, 50, 300, 30);
-        
-        scoreMax.setBounds(10, 410, 300, 30);
-        hightScore.setBounds(30, 440, 200, 30);
-        
-        start.addActionListener(managerButtons);
-        pause.addActionListener(managerButtons);
-        restart.addActionListener(managerButtons);
-        help.addActionListener(managerButtons);
-        actDesSombra.addActionListener(managerButtons);
-        
-        time.setFont(new Font("Arial", Font.BOLD, 15));
-        time.setForeground(Color.WHITE);
-        
-        line.setFont(new Font("Arial", Font.BOLD, 15));
-        line.setForeground(Color.WHITE);
-        
-        score.setFont(new Font("Arial", Font.BOLD, 15));
-        score.setForeground(Color.WHITE);
-        
-        scoreMax.setFont(new Font("Arial", Font.BOLD, 15));
-        scoreMax.setForeground(Color.WHITE);
-        hightScore.setFont(new Font("Arial", Font.BOLD, 15));
-        hightScore.setForeground(Color.WHITE);
-        
-        JPanel panel_buttons = new JPanel();
-        panel_buttons.setLayout(null);
-        panel_buttons.setBackground(Color.BLACK);
-        panel_buttons.setPreferredSize(new Dimension(130, 600));
-        panel_buttons.add(time);
-        panel_buttons.add(start);
-        panel_buttons.add(pause);
-        panel_buttons.add(restart);
-        panel_buttons.add(line);
-        panel_buttons.add(score);
-        panel_buttons.add(help);
-        panel_buttons.add(actDesSombra);
-        
-        panel_buttons.add(scoreMax);
-        panel_buttons.add(hightScore);
-        
-        
-        add(panel_buttons, BorderLayout.WEST);
     }
     
-        public static void setHightScore(){
+    public static void setHightScore(){
         try{
             lector = new BufferedReader(new FileReader("./storage/scoreMax.txt"));
             hightScore.setText(lector.readLine());

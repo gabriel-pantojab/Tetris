@@ -19,13 +19,17 @@ public class Chronometer {
     
     private boolean running;
     
-    public Chronometer(JLabelChronometer  label) {
+    public Chronometer() {
         minutes = 0;
         seconds = 0;
         milliseconds = 0;
         hours = 0;
-        this.label = label;
+        this.label = null;
         running = false;
+    }
+    
+    public void setLabel(JLabelChronometer  label) {
+        this.label = label;
     }
     
     public void start() {
@@ -38,20 +42,9 @@ public class Chronometer {
                 while(!hilo.end) {
                     if(!hilo.suspend) {
                         milliseconds++;
-                        if(milliseconds == 1000){
-                            milliseconds = 0;
-                            seconds++;
-                        }
-                        if(seconds == 60) {
-                            minutes++;
-                            seconds = 0;
-                        }
-                        if(minutes == 60) {
-                            minutes = 0;
-                            hours++;
-                        }
+                        controlTime();
                     }
-                    label.setInfo();
+                    actualizarLabel();
                     try{
                         synchronized(hilo) {
                             while(hilo.suspend) {
@@ -64,6 +57,28 @@ public class Chronometer {
             }
         };
         hilo.start();
+    }
+    
+    private void controlTime() {
+        if(milliseconds == 1000){
+            milliseconds = 0;
+            seconds++;
+        }
+        if(seconds == 60) {
+            minutes++;
+            seconds = 0;
+        }
+        if(minutes == 60) {
+            minutes = 0;
+            hours++;
+        }        
+    }
+    
+    private void actualizarLabel() {
+        if(label != null) {
+            label.setInfo();
+            label.run();
+        }
     }
     
     public void pause() {
@@ -82,9 +97,15 @@ public class Chronometer {
         minutes = seconds = milliseconds = 0;
     }
     
+    public void restart() {
+        minutes = seconds = milliseconds = 0;
+    }
+    
     public int getMinutes() {return minutes;}
     
     public int getSeconds() {return seconds;}
+    
+    public int getMilliseconds() {return milliseconds;}
     
     public int getHours() {return hours;}
     

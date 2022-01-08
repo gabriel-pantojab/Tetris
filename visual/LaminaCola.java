@@ -17,8 +17,8 @@ public class LaminaCola extends JPanel{
     public void restart() {
         LaminaGame.line = 0;
         LaminaGame.score = 0;
-        TetrisFrame.setLine();
-        TetrisFrame.setScore();
+        TetrisFrame.line.setText("Line: "+LaminaGame.line);;
+        TetrisFrame.score.setText("Score: "+LaminaGame.score);;
         game.end();
         game.restart();
         game.init();

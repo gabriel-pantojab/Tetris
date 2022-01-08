@@ -15,10 +15,10 @@ public class StaticWallFactory implements WallFactory {
     
     public StaticWallFactory() {
         walls = new Wall[4];
-        walls[0] = new ShapeRect(0, 2, Color.GRAY);
-        walls[1] = new ShapeRect(0, 6, Color.GRAY);
-        walls[2] = new ShapeRect(0, 10, Color.GRAY);
-        walls[3] = new ShapeRect(0, 14, Color.GRAY);
+        walls[0] = new ShapeRect(0, 2, new Color(77, 77, 77));
+        walls[1] = new ShapeRect(0, 6, new Color(77, 77, 77));
+        walls[2] = new ShapeRect(0, 10, new Color(77, 77, 77));
+        walls[3] = new ShapeRect(0, 14, new Color(77, 77, 77));
     }
     
     public Wall createWall() {

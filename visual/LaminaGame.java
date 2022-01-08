@@ -39,10 +39,11 @@ public class LaminaGame extends JPanel{
             g.drawLine(i*20, 20, i*20, 580);
         }
         
+        game.paintBoard(g);
         
         if(game.getCurrentWall() != null) {
             for (Block b : game.getCurrentWall().getBlocks()) {
-                if (b.getPositionInRow() >= 0) {
+                if (b.getPositionInRow() > game.getTope()) {
                     b.paint(g);
                 }else {
                     b.paintBorder(g);
@@ -52,7 +53,6 @@ public class LaminaGame extends JPanel{
                 game.getshadowCurrentWall().paintBorder(g);
             }
         }
-        game.paintBoard(g);
         
         if (game.isPause()) {
             g.setFont(new Font("Arial", Font.BOLD, 27));

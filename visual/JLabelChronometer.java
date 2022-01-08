@@ -10,10 +10,13 @@ import logic.Chronometer;
  */
 public class JLabelChronometer extends JLabel{
     private Chronometer cronometro;
+    private String text;
     
-    public JLabelChronometer() {
-        super("00:00:00");
-        cronometro = new Chronometer(this);
+    public JLabelChronometer(String text) {
+        super(text+"00:00:00");
+        this.text = text;
+        cronometro = new Chronometer();
+        cronometro.setLabel(this);
     }
     
     public void setInfo(){
@@ -35,11 +38,11 @@ public class JLabelChronometer extends JLabel{
         }else{
             h = ""+cronometro.getHours();
         }
-        setText(h+m+s);
+        setText(text+h+m+s);
     }
     
     public void stop() {
-        setText("00:00:00");
+        setText(text+"00:00:00");
         cronometro.stop();
     }
     
@@ -55,7 +58,13 @@ public class JLabelChronometer extends JLabel{
         cronometro.resume();
     }
     
+    public void restart(){
+        cronometro.restart();
+    }
+    
     public Chronometer getChronometer() {
         return cronometro;
     }
+    
+    public void run(){}
 }

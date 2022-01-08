@@ -20,30 +20,54 @@ public class Game{
     private int row_limit; //guarda la informacion de cuantas filas se debe borrar
     
     private WallFactory factory;
+    private StaticWallFactory factoryTope;
     
     private final int LIMIT_ROW    = 28;
     private final int LIMIT_COLUMN = 16;
     
-    private int tope = 1;
+    private int tope;
+    
+    private Level nivelActual;
     
     public Game(){
         topeWalls = new ArrayList<Wall[]>();
         factory = new RandomWallFactory();
+        factoryTope = new StaticWallFactory();
         walls = new LinkedList<Wall>();   
         board = new Element[28][16];
         wallsInBoard = new ArrayList<Wall>();
         row_limit = 0;
+        tope = -1;
         game_over = false;
         activar_sombra = false;
+        nivelActual = Level.getInstance(0);
     }
     
     public void restart(){
+        topeWalls = new ArrayList<Wall[]>();
         walls.clear();   
         clearBoard();
         wallsInBoard.clear();
         currentWall = null;
         row_limit = 0;
         game_over = false;
+        tope = -1;
+        init();
+        nivelActual = Level.getInstance(0);
+    }
+    
+    public Level getLevel() {
+        return nivelActual;
+    }
+    
+    public boolean nextLevel() {
+        if (nivelActual.getLevel() < Level.niveles.size()) {
+            nivelActual = Level.niveles.get(nivelActual.getLevel());
+            topeWalls = new ArrayList<Wall[]>();
+            tope = -1;
+            return true;
+        }
+        return false;
     }
     
     private void clearBoard(){
@@ -57,6 +81,21 @@ public class Game{
     public void init(){
         for(int i=0; i<5; i++)
             addWallQueue();
+    }
+    
+    public void addWallQueue(){
+        if(walls.size() < 5){
+            Wall new_wall = factory.createWall();
+            if(!walls.isEmpty()){
+                for(Wall w: walls)
+                    w.runTop(5);
+            }
+            walls.addLast(new_wall);
+        }
+    }
+    
+    public int getTope() {
+        return tope;
     }
     
     public void end(){
@@ -185,24 +224,13 @@ public class Game{
         return false;
     }
     
-    public void addWallQueue(){
-        if(walls.size() < 5){
-            Wall new_wall = factory.createWall();
-            if(!walls.isEmpty()){
-                for(Wall w: walls)
-                    w.runTop(5);
-            }
-            walls.addLast(new_wall);
-        }
-    }
-    
     public Wall throwWall(){
         Wall w = walls.pollFirst();
         int column = 7;//(int)(Math.random()*12+3);  
         if(w instanceof ShapeRect)
-            w.setCenter(new Position(0, column));
+            w.setCenter(new Position(tope + 1, column));
         else 
-            w.setCenter(new Position(1, column));
+            w.setCenter(new Position(tope + 2, column));
         w.recalculateWall();
         //Controlar si hay espacio para añadirlo
         for (Block b : w.getBlocks()) {
@@ -227,9 +255,9 @@ public class Game{
             currentWall.runBottom();
             return true;
         }
-        if (currentWall.center().getRow() < LIMIT_ROW / 2) {
+        //if (currentWall.center().getRow() < LIMIT_ROW / 2) {
             verifyGameOver();
-        }
+        //}
         return false;
     }
     
@@ -363,21 +391,43 @@ public class Game{
     
     private synchronized void verifyGameOver() {
         for(Block block: currentWall.getBlocks()){
-            if (block.getPositionInRow() < 1) game_over =  true; 
+            if (block.getPositionInRow() <= tope + 1) game_over =  true; 
         }
     }
     
-    public synchronized void paintBoard(Graphics g) {
-        for(Wall w: wallsInBoard){
-            for (Block b : w.getBlocks()) {
-                if (b.getPositionInRow() >= 0) b.paint(g);
-                else b.paintBorder(g);
+    public void throwTope() {
+        for(Wall[] w1 : topeWalls) {
+            for(Wall w2 : w1) {
+                w2.runBottom();
             }
         }
+        topeWalls.add(factoryTope.walls());
+        tope++;
+    }
+    
+    public synchronized void paintBoard(Graphics g) {
         for(Wall[] w1 : topeWalls) {
             for(Wall w2 : w1) {
                 w2.paint(g);
             }
         }
+        for(Wall w: wallsInBoard){
+            for (Block b : w.getBlocks()) {
+                if (b.getPositionInRow() > tope) b.paint(g);
+                else b.paintBorder(g);
+            }
+        }
+    }
+    
+    public void winnerAnimation() {
+        //crear 100 bloques aleatoriamente
+        //limpiar board
+        //limpiar walls del tope
+        /* añadir bloques aleatorios a wallsInBoard
+         * siguiendo un patron
+         * 3 bloques a la vez
+         * los 3 añadidos empiezan a caer
+         * y se los elimina llegando al piso
+         */
     }
 }
