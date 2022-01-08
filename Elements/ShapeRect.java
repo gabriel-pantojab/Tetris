@@ -4,11 +4,13 @@ import java.awt.Color;
 public class ShapeRect extends Wall{
     public ShapeRect() {
         super();
+        type = TypeWall.RECTANGLE;
     }
     
     public ShapeRect(int row_center, int column_center, Color color){
         super(4, row_center, column_center, color);
         createWall(row_center, column_center);
+        type = TypeWall.RECTANGLE;
     }
     
     public ShapeRect(Position center, Color color){

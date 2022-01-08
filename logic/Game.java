@@ -31,7 +31,7 @@ public class Game{
     
     public Game(){
         topeWalls = new ArrayList<Wall[]>();
-        factory = new RandomWallFactory();
+        factory = new RandomWallFactory(TypeWall.CRUZ);
         factoryTope = new StaticWallFactory();
         walls = new LinkedList<Wall>();   
         board = new Element[28][16];
@@ -85,7 +85,7 @@ public class Game{
     
     public void addWallQueue(){
         if(walls.size() < 5){
-            Wall new_wall = factory.createWall();
+            Wall new_wall = factory.createWall(27, 2);
             if(!walls.isEmpty()){
                 for(Wall w: walls)
                     w.runTop(5);
@@ -417,17 +417,5 @@ public class Game{
                 else b.paintBorder(g);
             }
         }
-    }
-    
-    public void winnerAnimation() {
-        //crear 100 bloques aleatoriamente
-        //limpiar board
-        //limpiar walls del tope
-        /* añadir bloques aleatorios a wallsInBoard
-         * siguiendo un patron
-         * 3 bloques a la vez
-         * los 3 añadidos empiezan a caer
-         * y se los elimina llegando al piso
-         */
     }
 }

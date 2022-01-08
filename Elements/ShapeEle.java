@@ -4,11 +4,13 @@ import java.awt.Color;
 public class ShapeEle extends Wall{
     public ShapeEle() {
         super();
+        type = TypeWall.ELE;
     }
     
     public ShapeEle(int row_center, int column_center, Color color){
         super(4, row_center, column_center, color);
         createWall(row_center, column_center);
+        type = TypeWall.ELE;
     }
     
     public ShapeEle(Position center, Color color){

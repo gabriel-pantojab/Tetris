@@ -4,11 +4,13 @@ import java.awt.Color;
 public class ShapeSquare extends Wall{
     public ShapeSquare() {
         super();
+        type = TypeWall.SQUARE;
     }
     
     public ShapeSquare(int row_center, int column_center, Color color){
         super(4, row_center, column_center, color);
         createWall(row_center, column_center);
+        type = TypeWall.SQUARE;
     }
     
     public ShapeSquare(Position center, Color color){

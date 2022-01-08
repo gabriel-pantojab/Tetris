@@ -4,11 +4,13 @@ import java.awt.Color;
 public class ShapeJ extends Wall{
     public ShapeJ() {
         super();
+        type = TypeWall.JOTA;
     }
     
     public ShapeJ(int row_center, int column_center, Color color){
         super(4, row_center, column_center, color);
         createWall(row_center, column_center);
+        type = TypeWall.JOTA;
     }
     
     public ShapeJ(Position center, Color color){

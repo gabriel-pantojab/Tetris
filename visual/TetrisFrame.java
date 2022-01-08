@@ -187,8 +187,8 @@ public class TetrisFrame extends JFrame{
                 winner = true;
                 JOptionPane.showMessageDialog(TetrisFrame.this, "Winner!!!");
                 //Animacion de bloques cayendo :)
-                winnerAnimation();
                 gameOver();
+                lamina_game.winnerAnimation();
             }
         }
     }
@@ -227,10 +227,6 @@ public class TetrisFrame extends JFrame{
     
     public void init(){
         game.init();
-    }
-    
-    private void winnerAnimation() {
-        
     }
     
     public static void setHightScore(){

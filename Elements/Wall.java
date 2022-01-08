@@ -10,6 +10,7 @@ public abstract class Wall{
     protected Color color;
     protected int length;
     protected Position center_position;
+    protected TypeWall type;
     private final ReentrantLock lock = new ReentrantLock();
     
     public Wall() {
@@ -38,6 +39,10 @@ public abstract class Wall{
     
     public void setColor(Color color) {
         this.color = color;
+    }
+    
+    public TypeWall getType() {
+        return type;
     }
     
     public void rotateLeft(){
@@ -111,7 +116,11 @@ public abstract class Wall{
     
     public void paint(Graphics g){
         lock.lock();
-        for(Block block: blocks) block.paint(g);
+        for(Block block: blocks){
+            if(block.isVisible()) {
+                block.paint(g);
+            }
+        }
         lock.unlock();
     }
     

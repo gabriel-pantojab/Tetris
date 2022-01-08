@@ -4,11 +4,13 @@ import java.awt.*;
 import java.awt.event.*;
 import Elements.*;
 import logic.*;
+import java.util.ArrayList;
 
 public class LaminaGame extends JPanel{
     private Game game;
     public static int line, score;
     private Manager manager;
+    ArrayList<Animation> ani;
     
     public LaminaGame(Game game){
         line = 0;
@@ -59,6 +61,42 @@ public class LaminaGame extends JPanel{
             g.setColor(Color.BLACK);
             g.drawString("ENTER para continuar", 33, 300);
         }
+        
+        if(ani != null) {
+            for(Animation a : ani) a.paint(g);
+        }
+    }
+    
+    private void initAnimation() {
+        ani = new ArrayList<Animation>();
+        for(int i = 0; i < 15; i++) {
+            int r = (int)(Math.random()*4+1);
+            Animation n;
+            switch(r){
+                case 1: n = new Animation(new AFTOP(), 27, LaminaGame.this);
+                break;
+                case 2: n = new Animation(new AFDOWN(), 27, LaminaGame.this);
+                break;
+                case 3: n = new Animation(new AFRIGHT(), 27, LaminaGame.this);
+                break;
+                default: n = new Animation(new AFLEFT(), 27, LaminaGame.this);
+            }
+            ani.add(n);
+        }
+    }
+    public void winnerAnimation() {
+        initAnimation();
+        Thread t = new Thread(){
+            public void run(){
+                try{
+                    for(Animation a : ani){
+                        a.run();
+                        Thread.sleep(300);
+                    }
+                }catch(Exception e){}
+            }
+        };
+        t.start();
     }
     
     private class Manager extends MouseAdapter implements KeyListener{

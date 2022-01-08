@@ -5,11 +5,13 @@ import java.util.ArrayList;
 public class ShapeZeta extends Wall{
     public ShapeZeta() {
         super();
+        type = TypeWall.ZETA;
     }
     
     public ShapeZeta(int row_center, int column_center, Color color){
         super(4, row_center, column_center, color);
         createWall(row_center, column_center);
+        type = TypeWall.ZETA;
     }
     
     public ShapeZeta(Position center, Color color){

@@ -21,8 +21,8 @@ public class StaticWallFactory implements WallFactory {
         walls[3] = new ShapeRect(0, 14, new Color(77, 77, 77));
     }
     
-    public Wall createWall() {
-        return new ShapeRect(0, 0, Color.GRAY);
+    public Wall createWall(int row, int column) {
+        return new ShapeRect(row, column, Color.GRAY);
     }
     
     public Wall[] walls() {
