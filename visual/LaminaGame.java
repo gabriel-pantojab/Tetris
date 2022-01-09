@@ -14,7 +14,7 @@ public class LaminaGame extends JPanel{
     
     public LaminaGame(Game game){
         line = 0;
-        score = 0;
+        score = 0;//21970;
         setBackground(new Color(153, 217, 234));
         manager = new Manager();
         this.game = game;
@@ -69,7 +69,7 @@ public class LaminaGame extends JPanel{
     
     private void initAnimation() {
         ani = new ArrayList<Animation>();
-        for(int i = 0; i < 15; i++) {
+        for(int i = 0; i < 10; i++) {
             int r = (int)(Math.random()*4+1);
             Animation n;
             switch(r){
@@ -84,15 +84,22 @@ public class LaminaGame extends JPanel{
             ani.add(n);
         }
     }
+    
+    public void des() {}
+    public void act(){}
+    
     public void winnerAnimation() {
         initAnimation();
         Thread t = new Thread(){
             public void run(){
                 try{
+                    des();
                     for(Animation a : ani){
                         a.run();
                         Thread.sleep(300);
                     }
+                    while(!ani.get(ani.size()-1).running().equals(Thread.State.TERMINATED));
+                    act();
                 }catch(Exception e){}
             }
         };

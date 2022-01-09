@@ -40,7 +40,7 @@ public class Animation {
                         caer();
                         controlCaida();
                         lamina.repaint();
-                        Thread.sleep(30);
+                        Thread.sleep(50);
                     }catch(Exception e){}
                 }
             }
@@ -50,15 +50,12 @@ public class Animation {
     
     private synchronized void caer() {
         for(int i = 0; i < walls.size(); i++) {
-            if(i == 1) {
+            if(i % 2 == 0) {
                 walls.get(i).runBottom();
-                walls.get(i).runBottom();
-            }else if(i == 2) {
-                walls.get(i).runBottom();
+            }else{
                 walls.get(i).runBottom();
                 walls.get(i).runBottom();
             }
-            else walls.get(i).runBottom();
         }
     }
     
@@ -79,5 +76,9 @@ public class Animation {
         for(Wall w : walls) {
             w.paint(g);
         }
+    }
+    
+    public Thread.State running(){
+        return hilo.getState();
     }
 }

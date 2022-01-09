@@ -34,7 +34,14 @@ public class TetrisFrame extends JFrame{
         setBounds(0, 0, 640, 650);
 
         game = new Game();
-        lamina_game = new LaminaGame(game);
+        lamina_game = new LaminaGame(game){
+            public void des(){
+                TetrisFrame.this.deshabilitarButtons();
+            }
+            public void act(){
+                TetrisFrame.this.habilitarButtons();
+            }
+        };
         cola = new LaminaCola(game);
         
         add(lamina_game, BorderLayout.CENTER);
@@ -59,7 +66,7 @@ public class TetrisFrame extends JFrame{
                 int t = this.getChronometer().getSeconds();
                 if(this.getChronometer().getMinutes() >= game.getLevel().timeInitTope()) {
                     //mejorar
-                    if((t == 30 || t == 60) && (this.getChronometer().getMilliseconds() == 0)) {    
+                    if((t == 30 || t == 59) && (this.getChronometer().getMilliseconds() == 0)) {    
                         game.throwTope();
                     }
                 }
@@ -188,7 +195,6 @@ public class TetrisFrame extends JFrame{
                 JOptionPane.showMessageDialog(TetrisFrame.this, "Winner!!!");
                 //Animacion de bloques cayendo :)
                 gameOver();
-                lamina_game.winnerAnimation();
             }
         }
     }
@@ -214,7 +220,7 @@ public class TetrisFrame extends JFrame{
         LaminaGame.score = 0;
         if(!winner) {
             JOptionPane.showMessageDialog(TetrisFrame.this, "GAME OVER!!!");
-        }else winner = false;
+        }
         time.stop();
         line.setText("Line: "+LaminaGame.line);
         score.setText("Score: "+LaminaGame.score);
@@ -223,6 +229,8 @@ public class TetrisFrame extends JFrame{
         level.setText("Level: "+game.getLevel().getLevel());
         cola.repaint();   
         lamina_game.repaint();
+        if(winner) lamina_game.winnerAnimation();
+        else winner = false;
     }
     
     public void init(){
@@ -252,6 +260,22 @@ public class TetrisFrame extends JFrame{
             }
         }catch (IOException io){
         }
+    }
+    
+    public void deshabilitarButtons() {
+        start.setEnabled(false);
+        pause.setEnabled(false);
+        restart.setEnabled(false);
+        help.setEnabled(false);
+        actDesSombra.setEnabled(false);
+    }
+    
+    public void habilitarButtons() {
+        start.setEnabled(true);
+        pause.setEnabled(true);
+        restart.setEnabled(true);
+        help.setEnabled(true);
+        actDesSombra.setEnabled(true);
     }
     
     private class ManagerButtons implements ActionListener {
