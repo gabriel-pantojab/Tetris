@@ -26,7 +26,8 @@ public class ShapeRect extends Wall{
     }
     
     public Wall clone(){
-        ShapeRect clone = new ShapeRect(center_position, color);
+        Position new_center_position = new Position(center_position.getRow(), center_position.getColumn());
+        ShapeRect clone = new ShapeRect(new_center_position, new Color(color.getRGB()));
         clone.setBlocks(this.cloneBlocks());
         return clone;
     }

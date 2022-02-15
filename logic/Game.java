@@ -262,13 +262,15 @@ public class Game{
     }
     
     public void runLeftCurrentWall(){
-        if((!currentWall.shockColumn(0) && !sideCrash(RotateDirection.LEFT)))
+        if((!currentWall.shockColumn(0) && !sideCrash(RotateDirection.LEFT))) {
             currentWall.runLeft();
+        }
     }
     
     public void runRightCurrentWall(){
-        if(!currentWall.shockColumn(LIMIT_COLUMN-1) && !sideCrash(RotateDirection.RIGHT))
+        if(!currentWall.shockColumn(LIMIT_COLUMN-1) && !sideCrash(RotateDirection.RIGHT)) {
             currentWall.runRight();
+        }
     }
     
     private boolean crashWithWallsInBoard(Wall clone_currentWall) {

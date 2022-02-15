@@ -26,7 +26,8 @@ public class ShapeS extends Wall{
     }
     
     public Wall clone(){
-        ShapeS clone = new ShapeS(center_position, color);
+        Position new_center_position = new Position(center_position.getRow(), center_position.getColumn());
+        ShapeS clone = new ShapeS(new_center_position, new Color(color.getRGB()));
         clone.setBlocks(this.cloneBlocks());
         return clone;
     }

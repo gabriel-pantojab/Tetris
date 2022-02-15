@@ -26,7 +26,8 @@ public class ShapeEle extends Wall{
     }
     
     public Wall clone(){
-        ShapeEle clone = new ShapeEle(center_position, color);
+        Position new_center_position = new Position(center_position.getRow(), center_position.getColumn());
+        ShapeEle clone = new ShapeEle(new_center_position, new Color(color.getRGB()));
         clone.setBlocks(this.cloneBlocks());
         return clone;
     }

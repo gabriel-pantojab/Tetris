@@ -28,7 +28,8 @@ public class ShapeCross extends Wall{
     }
     
     public Wall clone(){
-        ShapeCross clone = new ShapeCross(center_position, color);
+        Position new_center_position = new Position(center_position.getRow(), center_position.getColumn());
+        ShapeCross clone = new ShapeCross(new_center_position, new Color(color.getRGB()));
         clone.setBlocks(cloneBlocks());
         return clone;
     }

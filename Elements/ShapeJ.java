@@ -26,7 +26,8 @@ public class ShapeJ extends Wall{
     }
     
     public Wall clone(){
-        ShapeJ clone = new ShapeJ(center_position, color);
+        Position new_center_position = new Position(center_position.getRow(), center_position.getColumn());
+        ShapeJ clone = new ShapeJ(new_center_position, new Color(color.getRGB()));
         clone.setBlocks(this.cloneBlocks());
         return clone;
     }

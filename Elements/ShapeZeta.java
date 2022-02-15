@@ -27,7 +27,8 @@ public class ShapeZeta extends Wall{
     }
     
     public Wall clone(){
-        ShapeZeta clone = new ShapeZeta(center_position, color);
+        Position new_center_position = new Position(center_position.getRow(), center_position.getColumn());
+        ShapeZeta clone = new ShapeZeta(new_center_position, new Color(color.getRGB()));
         clone.setBlocks(cloneBlocks());
         return clone;
     }

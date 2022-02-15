@@ -26,6 +26,7 @@ public class TetrisFrame extends JFrame{
     JPanel panel_buttons = new JPanel();
     
     public TetrisFrame(){
+        super("Tetris");
         panel_buttons.setLayout(null);
         panel_buttons.setBackground(Color.BLACK);
         panel_buttons.setPreferredSize(new Dimension(130, 600));

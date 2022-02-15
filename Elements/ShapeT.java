@@ -26,7 +26,8 @@ public class ShapeT extends Wall{
     }
     
     public Wall clone(){
-        ShapeT clone = new ShapeT(center_position, color);
+        Position new_center_position = new Position(center_position.getRow(), center_position.getColumn());
+        ShapeT clone = new ShapeT(new_center_position, new Color(color.getRGB()));
         clone.setBlocks(this.cloneBlocks());
         return clone;
     }
