@@ -304,7 +304,7 @@ public class TetrisFrame extends JFrame{
                 if (game.isGame()) {
                     game.pause();
                     time.pause();
-                    timer.cancel();
+                    //timer.cancel();//
                 }
                 int opcion = JOptionPane.showConfirmDialog(TetrisFrame.this, "¿Esta seguro de reiniciar el juego?", "Warning", JOptionPane.OK_CANCEL_OPTION);
                 if(opcion == JOptionPane.YES_OPTION) {
@@ -312,6 +312,7 @@ public class TetrisFrame extends JFrame{
                         cola.restart();
                         time.stop();
                         //lamina_game.repaint();
+                        timer.cancel();
                     }
                 }
                 if(time.getChronometer().running()) {
